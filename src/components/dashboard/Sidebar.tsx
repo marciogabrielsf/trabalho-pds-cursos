@@ -1,0 +1,90 @@
+import React from "react";
+import { BookOpen, LogOut, Settings, User } from "lucide-react";
+import { APP_NAME } from "@/config/config";
+
+interface SidebarProps {
+    activeItem?: string;
+    onItemClick?: (item: string) => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ activeItem = "courses", onItemClick }) => {
+    const menuItems = [
+        {
+            id: "courses",
+            label: "Painel de Cursos",
+            icon: BookOpen,
+            isActive: activeItem === "courses",
+        },
+        {
+            id: "my-courses",
+            label: "Meus Cursos",
+            icon: User,
+            isActive: activeItem === "my-courses",
+        },
+    ];
+
+    return (
+        <aside className="w-72 bg-white border-r border-gray-200 h-screen">
+            <div className="p-6 h-full flex flex-col">
+                {/* Logo */}
+                <div className="flex items-center space-x-2 mb-8">
+                    <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+                        <div className="w-4 h-4 bg-white rounded-sm"></div>
+                    </div>
+                    <span className="text-xl font-bold text-secondary">{APP_NAME}</span>
+                </div>
+                <div className="flex flex-col justify-between h-full">
+                    <div className="mb-6">
+                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                            VISÃO GERAL
+                        </h3>
+
+                        <nav className="space-y-1">
+                            {menuItems.map((item) => {
+                                const Icon = item.icon;
+                                return (
+                                    <button
+                                        key={item.id}
+                                        onClick={() => onItemClick?.(item.id)}
+                                        className={`
+                    w-full flex items-center space-x-3 px-3 py-2 text-left rounded-lg transition-colors
+                    ${item.isActive ? " text-secondary " : "text-gray-600 hover:bg-gray-50 "}
+                  `}
+                                    >
+                                        <Icon
+                                            size={20}
+                                            className={
+                                                item.isActive ? "text-secondary" : "text-gray-400"
+                                            }
+                                        />
+                                        <span className="font-medium">{item.label}</span>
+                                    </button>
+                                );
+                            })}
+                        </nav>
+                    </div>
+                    <div>
+                        {/* Configuração */}
+                        <div className="pt-4 border-gray-200">
+                            <button className="w-full flex items-center space-x-3 px-3 py-2 text-left rounded-lg text-gray-600 hover:bg-gray-50 transition-colors">
+                                <Settings className="text-gray-400" />
+                                <span className="font-medium">Configuração</span>
+                            </button>
+                        </div>
+
+                        {/* Seção Sair */}
+                        <div className="pt-4">
+                            <button className="w-full flex items-center space-x-3 px-3 py-2 text-left rounded-lg text-red-600 hover:bg-red-50 transition-colors">
+                                <LogOut />
+                                <span className="font-medium">Sair</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {/* Seção Visão Geral */}
+            </div>
+        </aside>
+    );
+};
+
+export default Sidebar;

@@ -7,6 +7,7 @@
 
 @theme inline {
   --color-highlight: #FF6636;
+  --color-secondary: #702DFF;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -24,4 +25,8 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+button {
+  cursor: pointer;
 }
