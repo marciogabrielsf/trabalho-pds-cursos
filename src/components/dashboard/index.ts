@@ -3,4 +3,8 @@ export { default as DashboardHeader } from "./DashboardHeader";
 export { default as Categories } from "./Categories";
 export { default as CourseCard } from "./CourseCard";
 export { default as CoursesList } from "./CoursesList";
+export { default as CourseSearch } from "./CourseSearch";
 export { default as StudentDashboard } from "./StudentDashboard";
+export { default as MyCourseCard } from "./MyCourseCard";
+export { default as MyCoursesList } from "./MyCoursesList";
+export { default as MyCoursesPage } from "./MyCoursesPage";

@@ -1,5 +1,6 @@
 import React from "react";
 import { BookOpen, LogOut, Settings, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { APP_NAME } from "@/config/config";
 
 interface SidebarProps {
@@ -8,20 +9,29 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ activeItem = "courses", onItemClick }) => {
+    const router = useRouter();
+
     const menuItems = [
         {
             id: "courses",
             label: "Painel de Cursos",
             icon: BookOpen,
             isActive: activeItem === "courses",
+            path: "/dashboard/student",
         },
         {
             id: "my-courses",
             label: "Meus Cursos",
             icon: User,
             isActive: activeItem === "my-courses",
+            path: "/dashboard/student/my-courses",
         },
     ];
+
+    const handleItemClick = (item: (typeof menuItems)[0]) => {
+        router.push(item.path);
+        onItemClick?.(item.id);
+    };
 
     return (
         <aside className="w-72 bg-white border-r border-gray-200 h-screen">
@@ -45,7 +55,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = "courses", onItemClick }
                                 return (
                                     <button
                                         key={item.id}
-                                        onClick={() => onItemClick?.(item.id)}
+                                        onClick={() => handleItemClick(item)}
                                         className={`
                     w-full flex items-center space-x-3 px-3 py-2 text-left rounded-lg transition-colors
                     ${item.isActive ? " text-secondary " : "text-gray-600 hover:bg-gray-50 "}
