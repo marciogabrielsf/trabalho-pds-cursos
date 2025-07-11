@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import Sidebar from "./Sidebar";
 import DashboardHeader from "./DashboardHeader";
 import CourseSearch from "./CourseSearch";
@@ -92,28 +93,78 @@ const MyCoursesPage: React.FC = () => {
         }
     }, [searchQuery]);
 
+    // Configurações de animação
+    const springConfig = {
+        type: "spring" as const,
+        stiffness: 100,
+        damping: 20,
+    };
+
+    const containerVariants = {
+        initial: { opacity: 0 },
+        animate: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1,
+                delayChildren: 0.2,
+            },
+        },
+    };
+
+    const itemVariants = {
+        initial: { opacity: 0, y: 20 },
+        animate: {
+            opacity: 1,
+            y: 0,
+            transition: springConfig,
+        },
+    };
+
+    const slideInVariants = {
+        initial: { opacity: 0, x: -30 },
+        animate: {
+            opacity: 1,
+            x: 0,
+            transition: springConfig,
+        },
+    };
+
     const handleCourseClick = (course: Course) => {
         console.log("Continuar curso:", course);
         // Aqui você pode navegar para a página do curso
     };
 
     return (
-        <div className="flex">
+        <div className="flex bg-white">
             <Sidebar activeItem="my-courses" onItemClick={() => {}} />
-            <div className="flex h-screen w-full overflow-y-auto bg-white">
+            <motion.div
+                className="flex h-screen w-full overflow-y-auto bg-white"
+                variants={containerVariants}
+                initial="initial"
+                animate="animate"
+            >
                 <div className="flex-1">
-                    <DashboardHeader />
+                    <motion.div variants={slideInVariants}>
+                        <DashboardHeader />
+                    </motion.div>
 
                     <main className="w-full">
-                        <CourseSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                        <motion.div variants={itemVariants}>
+                            <CourseSearch
+                                searchQuery={searchQuery}
+                                setSearchQuery={setSearchQuery}
+                            />
+                        </motion.div>
 
-                        <MyCoursesList
-                            courses={filteredCourses}
-                            onCourseClick={handleCourseClick}
-                        />
+                        <motion.div variants={itemVariants}>
+                            <MyCoursesList
+                                courses={filteredCourses}
+                                onCourseClick={handleCourseClick}
+                            />
+                        </motion.div>
                     </main>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 };

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
 import { BarChart, BookOpen, FileStack, GraduationCap } from "lucide-react";
 import Sidebar from "./Sidebar";
@@ -44,6 +45,51 @@ const CourseDetailsPage: React.FC = () => {
         );
     };
 
+    // Configurações de animação
+    const springConfig = {
+        type: "spring" as const,
+        stiffness: 100,
+        damping: 20,
+    };
+
+    const containerVariants = {
+        initial: { opacity: 0 },
+        animate: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1,
+                delayChildren: 0.2,
+            },
+        },
+    };
+
+    const itemVariants = {
+        initial: { opacity: 0, y: 20 },
+        animate: {
+            opacity: 1,
+            y: 0,
+            transition: springConfig,
+        },
+    };
+
+    const slideInVariants = {
+        initial: { opacity: 0, x: -30 },
+        animate: {
+            opacity: 1,
+            x: 0,
+            transition: springConfig,
+        },
+    };
+
+    const heroVariants = {
+        initial: { opacity: 0, y: 30 },
+        animate: {
+            opacity: 1,
+            y: 0,
+            transition: springConfig,
+        },
+    };
+
     const renderTabContent = () => {
         switch (activeTab) {
             case "description":
@@ -81,14 +127,24 @@ const CourseDetailsPage: React.FC = () => {
     };
 
     return (
-        <div className="flex">
+        <div className="flex bg-white">
             <Sidebar activeItem="courses" onItemClick={() => {}} />
-            <div className="flex-1 bg-gray-50  overflow-scroll w-full h-screen">
-                <DashboardHeader />
+            <motion.div
+                className="flex-1 bg-gray-50 overflow-scroll w-full h-screen"
+                variants={containerVariants}
+                initial="initial"
+                animate="animate"
+            >
+                <motion.div variants={slideInVariants}>
+                    <DashboardHeader />
+                </motion.div>
 
                 <main className="px-6 pb-10">
                     {/* Breadcrumb */}
-                    <div className="flex flex-col items-start space-x-2 mb-6 bg-black/90 p-10 rounded-xl text-white">
+                    <motion.div
+                        className="flex flex-col items-start space-x-2 mb-6 bg-black/90 p-10 rounded-xl text-white"
+                        variants={heroVariants}
+                    >
                         {/* <button
                             onClick={() => router.back()}
                             className="flex items-center space-x-2 "
@@ -123,20 +179,25 @@ const CourseDetailsPage: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <motion.div
+                        className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+                        variants={itemVariants}
+                    >
                         {/* Main content - Video and course info */}
                         <div className="lg:col-span-2">
-                            <CourseHeader />
-                            <div className="mt-8">
+                            <motion.div variants={itemVariants}>
+                                <CourseHeader />
+                            </motion.div>
+                            <motion.div className="mt-8" variants={itemVariants}>
                                 <div className="bg-white rounded-lg p-6">
                                     <CourseTabs activeTab={activeTab} onTabChange={setActiveTab} />
                                     <div className="mt-6">{renderTabContent()}</div>
                                 </div>
-                            </div>
+                            </motion.div>
                         </div>
-                        <div className="lg:col-span-1">
+                        <motion.div className="lg:col-span-1" variants={itemVariants}>
                             <div className="sticky top-6">
                                 <PurchasePanel
                                     price={course.price}
@@ -148,14 +209,14 @@ const CourseDetailsPage: React.FC = () => {
                                     level="Iniciante e Intermediário"
                                 />
                             </div>
-                        </div>
+                        </motion.div>
 
                         {/* Sidebar - Purchase Panel */}
-                    </div>
+                    </motion.div>
 
                     {/* Tabs section */}
                 </main>
-            </div>
+            </motion.div>
         </div>
     );
 };
