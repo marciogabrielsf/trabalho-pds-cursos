@@ -13,3 +13,8 @@ export { default as CourseTabs } from "./CourseTabs";
 export { default as CourseDescription } from "./CourseDescription";
 export { default as PurchasePanel } from "./PurchasePanel";
 export { default as CourseDetailsPage } from "./CourseDetailsPage";
+export { default as CourseLearningPage } from "./CourseLearningPage";
+export { default as CourseContents } from "./CourseContents";
+export { default as LectureNotes } from "./LectureNotes";
+export { default as TabNavigator } from "./TabNavigator";
+export { default as Classroom } from "./Classroom";

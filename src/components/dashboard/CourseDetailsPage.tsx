@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
-import { BarChart, BookOpen, FileStack, GraduationCap } from "lucide-react";
 import Sidebar from "./Sidebar";
 import DashboardHeader from "./DashboardHeader";
 import CourseHeader from "./CourseHeader";
@@ -10,6 +9,7 @@ import CourseDescription from "./CourseDescription";
 import PurchasePanel from "./PurchasePanel";
 import { PaymentOption } from "../ui/PaymentSelector";
 import { mockCourses } from "../../data/mockData";
+import CourseDetailsHorizontal from "./CourseDetailsHorizontal";
 
 const CourseDetailsPage: React.FC = () => {
     const params = useParams();
@@ -81,15 +81,6 @@ const CourseDetailsPage: React.FC = () => {
         },
     };
 
-    const heroVariants = {
-        initial: { opacity: 0, y: 30 },
-        animate: {
-            opacity: 1,
-            y: 0,
-            transition: springConfig,
-        },
-    };
-
     const renderTabContent = () => {
         switch (activeTab) {
             case "description":
@@ -140,47 +131,7 @@ const CourseDetailsPage: React.FC = () => {
                 </motion.div>
 
                 <main className="px-6 pb-10">
-                    {/* Breadcrumb */}
-                    <motion.div
-                        className="flex flex-col items-start space-x-2 mb-6 bg-black/90 p-10 rounded-xl text-white"
-                        variants={heroVariants}
-                    >
-                        {/* <button
-                            onClick={() => router.back()}
-                            className="flex items-center space-x-2 "
-                        >
-                            <ArrowLeft size={20} />
-                            <span>Voltar</span>
-                        </button> */}
-                        <div className="flex flex-col gap-3">
-                            <div className="flex gap-3 items-center">
-                                <span className="p-2 bg-white/30 rounded-xl font-semibold">
-                                    {course.category}
-                                </span>
-                                <p>Por: {course.instructor}</p>
-                            </div>
-                            <h1 className=" font-semibold text-3xl">{course.title}</h1>
-                            <div className="flex gap-3 text-[#9D9D9D] text-xs">
-                                <div className="flex items-center gap-2">
-                                    <BookOpen className="text-highlight" />
-                                    <span>{course.lessonsCount} Aulas</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <GraduationCap className="text-highlight" />
-                                    <span>{course.studentsCount} Alunos Matriculados</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <BarChart className="text-highlight" />
-                                    <span>{course.level}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <FileStack className="text-highlight" />
-                                    <span>{course.lessonsCount} Aulas</span>
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
-
+                    <CourseDetailsHorizontal course={course} />;
                     <motion.div
                         className="grid grid-cols-1 lg:grid-cols-3 gap-8"
                         variants={itemVariants}
@@ -213,7 +164,6 @@ const CourseDetailsPage: React.FC = () => {
 
                         {/* Sidebar - Purchase Panel */}
                     </motion.div>
-
                     {/* Tabs section */}
                 </main>
             </motion.div>
