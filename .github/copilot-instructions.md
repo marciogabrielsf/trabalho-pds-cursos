@@ -1,119 +1,236 @@
-# Copilot Instructions - Coursue (Sistema de Gestão de Cursos)
+# Copilot Instructions - Sistema de Gestão de Cursos Online
 
-## Architecture Overview
+## � Visão Geral do Sistema
 
-This is a **Next.js 15 + TypeScript** educational platform with a **component-driven architecture**. The app uses **App Router** with role-based dashboard routes (`/dashboard/student`, `/dashboard/teacher`) and **Zustand** for state management with **TanStack Query** for server state.
+Sistema de gestão de cursos online com **conteúdo modular** - trabalho acadêmico focado na implementação de padrões de design. A plataforma permite que professores criem cursos com módulos reutilizáveis, alunos se inscrevam e progridam sequencialmente, com comunicação dinâmica e sistema de pagamento.
 
-## Key Technologies & Patterns
+### Stack Principal
 
-- **Next.js 15**: App Router, Server Components, client components marked with `"use client"`
-- **State Management**: Zustand stores with persistence (`authStore`, `courseStore`)
-- **Data Fetching**: TanStack Query v5 with configured defaults (1min staleTime, 10min gcTime)
-- **Styling**: TailwindCSS v4 with custom CSS variables (`--color-highlight: #FF6636`, `--color-secondary: #702DFF`)
-- **Animation**: Framer Motion for component transitions
-- **Icons**: Lucide React throughout
+-   **Next.js 15** com App Router e Turbopack
+-   **TypeScript** com strict mode
+-   **Zustand** para estado global (com persistência localStorage)
+-   **TanStack Query** para cache e queries
+-   **TailwindCSS** para estilização
+-   **Framer Motion** para animações
+-   **Dados mockados** (backend em desenvolvimento)
 
-## Component Organization
+## �️ Arquitetura e Padrões de Design
 
-Components are organized by **functional domains** in `src/components/dashboard/`:
+### Padrões Obrigatórios a Implementar:
 
-```
-dashboard/
-├── layout/        # Sidebar, DashboardHeader, StudentDashboard
-├── courses/       # CourseCard, CoursesList, CourseSearch, Categories
-├── classroom/     # Classroom, ClassroomPost, ActivitiesSidebar
-├── learning/      # CourseLearningPage, CourseContents, LectureNotes
-└── shared/        # TabNavigator, reusable components
-```
+1. **Composite** - Estrutura hierárquica: Curso → Módulos → Aulas (vídeo, texto, quiz)
+2. **Observer** - Notificações dinâmicas (professor ↔ alunos para trabalhos/respostas)
+3. **Mediator** - Comunicação desacoplada entre participantes do curso
+4. **Strategy** - Formas de pagamento (cartão 3x, Pix 5% desconto, boleto integral)
+5. **Prototype** - Reutilização de módulos entre cursos
+6. **Chain of Responsibility** - Controle sequencial de progresso (módulo/aula anterior obrigatório)
+7. **DAO** - Abstração de acesso a dados (CursoDAO, AlunoDAO, etc.)
+8. **BO** - Lógica de negócio encapsulada (CursoBO, AlunoBO, PagamentoBO)
+9. **MVC** - Separação apresentação/controle/modelo
 
-**Import Pattern**: Use barrel exports via `index.ts` files:
+### Regras de Negócio Críticas:
+
+-   **Progresso Sequencial**: Módulo/aula só libera após anterior completar
+-   **Comunicação Dinâmica**: Novos alunos podem entrar a qualquer momento
+-   **Notificações**: Professor ↔ alunos para trabalhos e respostas
+-   **Reutilização**: Módulos podem ser copiados entre cursos
+
+## 🎯 Padrões de Desenvolvimento
+
+### 1. Estrutura de Domínio (Padrões BO + DAO)
+
 ```typescript
-import { CourseCard, CoursesList } from '@/components/dashboard/courses';
-import { Classroom, ClassroomPost } from '@/components/dashboard/classroom';
+// Camada de Negócio (BO)
+src/business/
+├── CursoBO.ts          // Criar cursos, adicionar módulos, inscrições
+├── AlunoBO.ts          // Progresso, verificação sequencial
+├── PagamentoBO.ts      // Estratégias de pagamento
+├── MensagemBO.ts       // Comunicação via Mediator
+└── TrabalhoBO.ts       // Envio/recebimento de trabalhos
+
+// Camada de Dados (DAO)
+src/dao/
+├── CursoDAO.ts         // CRUD cursos
+├── AlunoDAO.ts         // CRUD alunos e progresso
+├── ModuloDAO.ts        // CRUD módulos
+├── AulaDAO.ts          // CRUD aulas
+└── PagamentoDAO.ts     // CRUD pagamentos
 ```
 
-## Authentication Flow
+### 2. Implementação de Padrões Core
 
-- **Auto-login**: `src/app/page.tsx` simulates login for demo (`login()` in useEffect)
-- **Route Protection**: `src/app/dashboard/layout.tsx` checks `isAuthenticated` and redirects
-- **Zustand Persistence**: Auth state persists to localStorage via `persist` middleware
-- **User Roles**: `"student" | "teacher"` determine dashboard access
-
-## Data Patterns
-
-### Mock Data Structure
-- **Courses**: `src/data/mockData.ts` - contains `mockCourses[]` and `mockCategories[]`
-- **Classroom**: `src/components/dashboard/classroom/classroomTypes.ts` - posts and activities
-- **Typing**: Interfaces co-located with components (e.g., `ClassroomPost`, `Activity`)
-
-### State Management
 ```typescript
-// Zustand stores follow this pattern:
+// Composite - Hierarquia de conteúdo
+interface ComponenteCurso {
+    id: string;
+    nome: string;
+    podeAcessar(aluno: Aluno): boolean;
+    marcarConcluido(aluno: Aluno): void;
+}
+
+// Strategy - Formas de pagamento
+interface EstrategiaPagamento {
+    calcularValor(valorBase: number): number;
+    processar(dados: DadosPagamento): ResultadoPagamento;
+}
+
+// Chain of Responsibility - Controle de progresso
+interface VerificadorProgresso {
+    verificar(aluno: Aluno, conteudo: ComponenteCurso): boolean;
+    setProximo(verificador: VerificadorProgresso): void;
+}
+```
+
+### 3. Estrutura de Rotas e Autenticação
+
+```typescript
+// Fluxo de autenticação: página principal → dashboard baseado em role
+src/app/page.tsx              // Login + auto-redirect para dashboard
+src/app/dashboard/layout.tsx  // Guard de autenticação
+src/app/dashboard/student/    // Rotas específicas do estudante
+src/app/dashboard/teacher/    // Rotas específicas do professor
+```
+
+### 4. Gerenciamento de Estado
+
+Use **Zustand** para estado global com persistência:
+
+```typescript
+// Pattern: stores/<feature>Store.ts
 export const useAuthStore = create<AuthState>()(
-  persist(
-    (set, get) => ({
-      // state and actions
-    }),
-    { name: "auth-storage", storage: createJSONStorage(() => localStorage) }
-  )
+    persist(
+        (set, get) => ({
+            // State logic
+        }),
+        {
+            name: "auth-storage",
+            storage: createJSONStorage(() => localStorage),
+        }
+    )
 );
 ```
 
-## Classroom Component System
+### 5. Organização de Componentes
 
-The **Classroom** is a complex component with:
-- **Posts**: Three types (`"announcement" | "assignment" | "material"`)
-- **Comments**: Support line breaks via `whitespace-pre-wrap`, Enter/Shift+Enter UX
-- **Activities Sidebar**: Right-aligned activities panel
-- **State Management**: Local state for comments, passed via props to child components
+```typescript
+// Estrutura hierárquica por funcionalidade
+src/components/
+├── dashboard/
+│   ├── layout/     // Sidebar, Header, etc.
+│   ├── courses/    // Course cards, lists, search
+│   ├── classroom/  // Virtual classroom components
+│   ├── learning/   // Learning experience
+│   └── shared/     // Reusable dashboard components
+├── auth/           // Login, forms
+└── ui/             // Base UI components
+```
 
-## Development Commands
+### 6. Imports Centralizados
+
+```typescript
+// Use barrel exports para imports limpos
+import { CourseCard, CoursesList } from "@/components/dashboard/courses";
+import { Sidebar, DashboardHeader } from "@/components/dashboard/layout";
+```
+
+## 🔧 Comandos de Desenvolvimento
 
 ```bash
-yarn dev          # Development with Turbopack
-yarn build        # Production build
-yarn lint         # ESLint
+# Desenvolvimento com Turbopack (mais rápido)
+yarn dev
+
+# Build e produção
+yarn build && yarn start
+
+# Linting
+yarn lint
 ```
 
-## UI/UX Patterns
+## 📊 Data Flow & Mock Data
 
-### Design System
-- **Orange Theme**: Primary `#FF6636`, Secondary `#702DFF`
-- **Gradient Avatars**: `bg-gradient-to-br from-orange-400 to-red-400`
-- **Cards**: `bg-white rounded-lg shadow-sm border-2 hover:shadow-md`
-- **Buttons**: Orange variants with hover states
+### Dados Mockados
 
-### Animation Patterns
+-   **Cursos**: `src/data/mockData.ts` - array de cursos com categorias, preços, progress
+-   **Usuários**: Simulado no `authStore` com auto-login
+-   **Categorias**: Part of course data structure
+
+### Estados Relacionados
+
 ```typescript
-// Framer Motion standard pattern:
-<motion.div
-  initial={{ opacity: 0, height: 0 }}
-  animate={{ opacity: 1, height: "auto" }}
-  transition={{ duration: 0.3 }}
->
+// authStore: user, isAuthenticated, role-based routing
+// courseStore: courses, categories, search, filters
 ```
 
-## File Routing
+## 🎨 Padrões de UI
 
-- **Student Routes**: `/dashboard/student/[page]`
-- **Dynamic Routes**: `/dashboard/student/courses/[id]` → `CourseDetailsPage`
-- **Nested Layouts**: Dashboard layout wraps all `/dashboard/*` routes
-- **Page Components**: Thin wrappers importing from `@/components/dashboard`
+### Convenções TailwindCSS
 
-## Critical Development Notes
+-   **Classes utilitárias**: Prefira atomic classes
+-   **Responsividade**: Mobile-first approach
+-   **Cores**: Sistema baseado em `secondary` (visto no loading spinner)
 
-1. **Component Exports**: Always use barrel exports via `index.ts` files
-2. **State Updates**: Use Zustand actions, not direct state mutation
-3. **TanStack Query**: Leverage configured defaults, avoid overriding staleTime/gcTime
-4. **Comments**: Use `whitespace-pre-wrap` for line break support
-5. **Responsive**: All components should be mobile-first responsive
-6. **Loading States**: Include loading/error states for async operations
+### Animações
 
-## Integration Points
+-   **Framer Motion**: Para transições e micro-interações
+-   **CSS Classes**: `animate-spin` para loading states
 
-- **QueryProvider**: Wraps entire app in `src/app/layout.tsx`
-- **Route Guards**: Dashboard layout checks authentication
-- **Mock Services**: `src/services/authService.ts` ready for real API integration
-- **LocalStorage**: Zustand persist middleware for auth state
+## 🔧 Configurações Específicas
 
-When adding new features, follow the established patterns: organize by domain, use TypeScript interfaces, leverage existing state management, and maintain responsive design.
+### React Query
+
+-   **Stale Time**: 1 minuto
+-   **Cache Time**: 10 minutos
+-   **Retry**: 1 tentativa
+-   **DevTools**: Habilitado em desenvolvimento
+
+### TypeScript
+
+-   **Strict mode**: Ativado
+-   **Path mapping**: `@/*` para `./src/*`
+-   **Target**: ES2017
+
+### Next.js
+
+-   **App Router**: Exclusivo (não Pages Router)
+-   **Turbopack**: Habilitado no dev mode
+-   **Font**: Inter com variable font
+
+## 📝 Ao Desenvolver
+
+1. **Novos Componentes**: Organize por funcionalidade em `components/dashboard/<area>/`
+2. **Estado Global**: Use Zustand com persistência quando apropriado
+3. **Tipos**: Defina interfaces em arquivos dedicados (`types/`, `stores/`)
+4. **Rotas**: Siga pattern role-based em `app/dashboard/<role>/`
+5. **Imports**: Use barrel exports para imports limpos
+6. **Mock Data**: Adicione dados em `src/data/mockData.ts`
+
+## 🚀 Padrões de Desenvolvimento
+
+### Client Components
+
+```typescript
+// Sempre use "use client" para componentes com:
+// - Hooks de estado (useState, useEffect)
+// - Stores do Zustand
+// - Interações do usuário
+```
+
+### Error Boundaries e Loading States
+
+```typescript
+// Pattern para loading states
+if (!isAuthenticated) {
+    return <LoadingSpinner />;
+}
+```
+
+### Role-Based Navigation
+
+```typescript
+// Redirect pattern baseado em role
+useEffect(() => {
+    if (isAuthenticated) {
+        router.push("/dashboard/student"); // ou /teacher
+    }
+}, [isAuthenticated, router]);
+```

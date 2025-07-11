@@ -7,26 +7,25 @@ import { useAuthStore } from "../stores/authStore";
 
 export default function Home() {
     const router = useRouter();
-    const { isAuthenticated, login } = useAuthStore();
-
-    useEffect(() => {
-        // Simular login automático para demonstração
-        if (!isAuthenticated) {
-            login({
-                id: "1",
-                name: "Natália Ruth",
-                email: "natalia@email.com",
-                role: "student",
-            });
-        }
-    }, [isAuthenticated, login]);
+    const { isAuthenticated, user } = useAuthStore();
 
     useEffect(() => {
         // Redirecionar para dashboard se autenticado
-        if (isAuthenticated) {
-            router.push("/dashboard/student");
+        if (isAuthenticated && user) {
+            const dashboardPath =
+                user.role === "teacher" ? "/dashboard/teacher" : "/dashboard/student";
+            router.push(dashboardPath);
         }
-    }, [isAuthenticated, router]);
+    }, [isAuthenticated, user, router]);
+
+    // Se estiver autenticado, não mostrar a página de login
+    if (isAuthenticated) {
+        return (
+            <div className="h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
+            </div>
+        );
+    }
 
     return <LoginPage />;
 }

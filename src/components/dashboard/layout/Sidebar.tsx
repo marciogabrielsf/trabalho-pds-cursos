@@ -2,6 +2,7 @@ import React from "react";
 import { BookOpen, LogOut, Settings, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { APP_NAME } from "@/config/config";
+import { useAuthStore } from "@/stores/authStore";
 
 interface SidebarProps {
     activeItem?: string;
@@ -10,6 +11,13 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ activeItem = "courses", onItemClick }) => {
     const router = useRouter();
+
+    const { logout } = useAuthStore();
+
+    const handleLogout = () => {
+        logout();
+        router.push("/");
+    };
 
     const menuItems = [
         {
@@ -84,7 +92,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = "courses", onItemClick }
 
                         {/* Seção Sair */}
                         <div className="pt-4">
-                            <button className="w-full flex items-center space-x-3 px-3 py-2 text-left rounded-lg text-red-600 hover:bg-red-50 transition-colors">
+                            <button
+                                onClick={handleLogout}
+                                className="w-full flex items-center space-x-3 px-3 py-2 text-left rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                            >
                                 <LogOut />
                                 <span className="font-medium">Sair</span>
                             </button>
