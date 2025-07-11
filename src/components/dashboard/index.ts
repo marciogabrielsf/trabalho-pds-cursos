@@ -8,3 +8,8 @@ export { default as StudentDashboard } from "./StudentDashboard";
 export { default as MyCourseCard } from "./MyCourseCard";
 export { default as MyCoursesList } from "./MyCoursesList";
 export { default as MyCoursesPage } from "./MyCoursesPage";
+export { default as CourseHeader } from "./CourseHeader";
+export { default as CourseTabs } from "./CourseTabs";
+export { default as CourseDescription } from "./CourseDescription";
+export { default as PurchasePanel } from "./PurchasePanel";
+export { default as CourseDetailsPage } from "./CourseDetailsPage";

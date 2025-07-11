@@ -7,7 +7,6 @@ interface CoursesListProps {
     title: string;
     subtitle?: string;
     showResults?: boolean;
-    onCourseClick?: (course: Course) => void;
 }
 
 const CoursesList: React.FC<CoursesListProps> = ({
@@ -15,7 +14,6 @@ const CoursesList: React.FC<CoursesListProps> = ({
     title,
     subtitle,
     showResults = false,
-    onCourseClick,
 }) => {
     return (
         <div className="px-6 py-6">
@@ -48,11 +46,7 @@ const CoursesList: React.FC<CoursesListProps> = ({
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {courses.map((course) => (
-                        <CourseCard
-                            key={course.id}
-                            course={course}
-                            onClick={() => onCourseClick?.(course)}
-                        />
+                        <CourseCard key={course.id} course={course} />
                     ))}
                 </div>
             )}

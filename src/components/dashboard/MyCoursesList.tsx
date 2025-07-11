@@ -7,7 +7,7 @@ interface MyCoursesListProps {
     onCourseClick?: (course: Course) => void;
 }
 
-const MyCoursesList: React.FC<MyCoursesListProps> = ({ courses, onCourseClick }) => {
+const MyCoursesList: React.FC<MyCoursesListProps> = ({ courses }) => {
     return (
         <div className="px-6 py-6">
             <div className="mb-6">
@@ -28,11 +28,7 @@ const MyCoursesList: React.FC<MyCoursesListProps> = ({ courses, onCourseClick })
             ) : (
                 <div className="space-y-4">
                     {courses.map((course) => (
-                        <MyCourseCard
-                            key={course.id}
-                            course={course}
-                            onClick={() => onCourseClick?.(course)}
-                        />
+                        <MyCourseCard key={course.id} course={course} />
                     ))}
                 </div>
             )}

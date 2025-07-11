@@ -1,13 +1,13 @@
 import React from "react";
+import Link from "next/link";
 import { Clock, Users, Play } from "lucide-react";
 import { Course } from "../../stores/courseStore";
 
 interface CourseCardProps {
     course: Course;
-    onClick?: () => void;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course, onClick }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat("pt-BR", {
             style: "currency",
@@ -15,11 +15,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onClick }) => {
         }).format(price);
     };
 
-    return (
-        <div
-            className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg hover:-translate-y-2 transition-all duration-200 cursor-pointer group"
-            onClick={onClick}
-        >
+    const cardContent = (
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg hover:-translate-y-2 transition-all duration-200 cursor-pointer group">
             {/* Imagem do curso */}
             <div className="relative">
                 <div className="w-full h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
@@ -99,6 +96,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onClick }) => {
             </div>
         </div>
     );
+
+    return <Link href={`/dashboard/student/courses/${course.id}`}>{cardContent}</Link>;
 };
 
 export default CourseCard;

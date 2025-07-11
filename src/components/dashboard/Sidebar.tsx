@@ -34,7 +34,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = "courses", onItemClick }
     };
 
     return (
-        <aside className="w-72 bg-white border-r border-gray-200 h-screen">
+        <aside className="min-w-64 bg-white border-r border-gray-200 h-screen">
             <div className="p-6 h-full flex flex-col">
                 {/* Logo */}
                 <div className="flex items-center space-x-2 mb-8">
@@ -67,7 +67,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = "courses", onItemClick }
                                                 item.isActive ? "text-secondary" : "text-gray-400"
                                             }
                                         />
-                                        <span className="font-medium">{item.label}</span>
+                                        <span className="font-normal">{item.label}</span>
                                     </button>
                                 );
                             })}

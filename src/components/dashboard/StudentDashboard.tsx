@@ -3,7 +3,7 @@ import Sidebar from "./Sidebar";
 import DashboardHeader from "./DashboardHeader";
 import Categories from "./Categories";
 import CoursesList from "./CoursesList";
-import { useCourseStore, Course } from "../../stores/courseStore";
+import { useCourseStore } from "../../stores/courseStore";
 import { mockCategories, mockCourses } from "../../data/mockData";
 import CourseSearch from "./CourseSearch";
 
@@ -30,11 +30,6 @@ const StudentDashboard: React.FC = () => {
 
     const filteredCourses = getFilteredCourses();
     const developmentCourses = courses.filter((course) => course.category === "Development");
-
-    const handleCourseClick = (course: Course) => {
-        console.log("Curso clicado:", course);
-        // Aqui você pode navegar para a página do curso
-    };
 
     return (
         <div className="flex">
@@ -65,14 +60,12 @@ const StudentDashboard: React.FC = () => {
                                 }
                                 subtitle={searchQuery ? `Busca por: "${searchQuery}"` : undefined}
                                 showResults={true}
-                                onCourseClick={handleCourseClick}
                             />
                         ) : (
                             <CoursesList
                                 courses={developmentCourses}
                                 title="Cursos Disponíveis"
                                 subtitle="Explore nossos cursos mais populares para uma jornada de aprendizado incrível"
-                                onCourseClick={handleCourseClick}
                             />
                         )}
                     </main>
