@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
-import { Play, Pause, SkipBack, SkipForward, Volume2, Maximize, Settings } from "lucide-react";
-import Sidebar from "./Sidebar";
 import CourseContents from "./CourseContents";
 import LectureNotes from "./LectureNotes";
-import TabNavigator from "./TabNavigator";
-import Classroom from "./Classroom";
-import { mockCourses } from "../../data/mockData";
-import CourseDetailsHorizontal from "./CourseDetailsHorizontal";
-import DashboardHeader from "./DashboardHeader";
+import { mockCourses } from "@/data/mockData";
+import {
+    Classroom,
+    CourseDetailsHorizontal,
+    DashboardHeader,
+    Sidebar,
+    TabNavigator,
+} from "@/components";
 
 // Mock data for course modules
 const mockModules = [
@@ -89,10 +90,7 @@ const CourseLearningPage: React.FC = () => {
     const params = useParams();
     const router = useRouter();
     const [modules, setModules] = useState(mockModules);
-    const [isPlaying, setIsPlaying] = useState(false);
     const [activeTab, setActiveTab] = useState("videos");
-    const currentTime = "1:29";
-    const totalTime = "8:15";
 
     const courseId = params.id as string;
     const course = mockCourses.find((c) => c.id === courseId);
@@ -176,10 +174,6 @@ const CourseLearningPage: React.FC = () => {
         console.log(`Download file ${fileId}`);
     };
 
-    const togglePlayPause = () => {
-        setIsPlaying(!isPlaying);
-    };
-
     const renderTabContent = () => {
         switch (activeTab) {
             case "videos":
@@ -193,65 +187,11 @@ const CourseLearningPage: React.FC = () => {
                                 variants={itemVariants}
                                 style={{ aspectRatio: "16/9" }}
                             >
-                                {/* Video placeholder */}
-                                <div
-                                    className="absolute inset-0 bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center"
-                                    style={{
-                                        backgroundImage:
-                                            "url('https://images.unsplash.com/photo-1494790108755-2616c056ca88?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80')",
-                                        backgroundSize: "cover",
-                                        backgroundPosition: "center",
-                                    }}
-                                >
-                                    <div className="absolute inset-0 bg-black bg-opacity-40" />
-                                    <motion.button
-                                        onClick={togglePlayPause}
-                                        className="relative z-10 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 rounded-full p-4 transition-all duration-300"
-                                        whileHover={{ scale: 1.1 }}
-                                        whileTap={{ scale: 0.9 }}
-                                    >
-                                        {isPlaying ? (
-                                            <Pause size={32} className="text-white" />
-                                        ) : (
-                                            <Play size={32} className="text-white ml-1" />
-                                        )}
-                                    </motion.button>
-                                </div>
-
-                                {/* Video Controls */}
-                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
-                                    <div className="flex items-center space-x-4">
-                                        <button
-                                            onClick={togglePlayPause}
-                                            className="text-white hover:text-gray-300 transition-colors"
-                                        >
-                                            {isPlaying ? <Pause size={20} /> : <Play size={20} />}
-                                        </button>
-                                        <button className="text-white hover:text-gray-300 transition-colors">
-                                            <SkipBack size={20} />
-                                        </button>
-                                        <button className="text-white hover:text-gray-300 transition-colors">
-                                            <SkipForward size={20} />
-                                        </button>
-                                        <div className="flex-1 mx-4">
-                                            <div className="bg-white bg-opacity-30 rounded-full h-1">
-                                                <div className="bg-white rounded-full h-1 w-1/4" />
-                                            </div>
-                                        </div>
-                                        <span className="text-white text-sm">
-                                            {currentTime} / {totalTime}
-                                        </span>
-                                        <button className="text-white hover:text-gray-300 transition-colors">
-                                            <Volume2 size={20} />
-                                        </button>
-                                        <button className="text-white hover:text-gray-300 transition-colors">
-                                            <Settings size={20} />
-                                        </button>
-                                        <button className="text-white hover:text-gray-300 transition-colors">
-                                            <Maximize size={20} />
-                                        </button>
-                                    </div>
-                                </div>
+                                {" "}
+                                <iframe
+                                    className="w-full h-full"
+                                    src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=BosetgPbu-0kDSpu"
+                                ></iframe>{" "}
                             </motion.div>
 
                             {/* Lesson Content */}
@@ -326,7 +266,7 @@ Donec congue placerat lorem ipsum congue."
             >
                 <DashboardHeader />
 
-                <div className="p-6">
+                <div className="px-6">
                     <CourseDetailsHorizontal course={course} />
 
                     {/* Tab Navigator */}

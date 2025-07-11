@@ -2,11 +2,9 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Sidebar from "./Sidebar";
 import DashboardHeader from "./DashboardHeader";
-import Categories from "./Categories";
-import CoursesList from "./CoursesList";
-import { useCourseStore } from "../../stores/courseStore";
-import { mockCategories, mockCourses } from "../../data/mockData";
-import CourseSearch from "./CourseSearch";
+import { Categories, CoursesList, CourseSearch } from "../courses";
+import { useCourseStore } from "../../../stores/courseStore";
+import { mockCategories, mockCourses } from "../../../data/mockData";
 
 const StudentDashboard: React.FC = () => {
     const [activeMenuItem, setActiveMenuItem] = useState("courses");

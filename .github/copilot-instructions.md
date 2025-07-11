@@ -1,133 +1,119 @@
-# Copilot Instructions - Coursue LMS Platform
+# Copilot Instructions - Coursue (Sistema de Gestão de Cursos)
 
 ## Architecture Overview
 
-This is a Next.js 15 course management system built with TypeScript, TailwindCSS, and Zustand for state management. The platform serves both students and teachers with separate dashboards.
+This is a **Next.js 15 + TypeScript** educational platform with a **component-driven architecture**. The app uses **App Router** with role-based dashboard routes (`/dashboard/student`, `/dashboard/teacher`) and **Zustand** for state management with **TanStack Query** for server state.
 
-### Key Technologies
+## Key Technologies & Patterns
 
--   **Next.js 15** with App Router (`src/app/`)
--   **Zustand** for global state management (persisted in localStorage)
--   **TailwindCSS** for styling with custom theme colors
--   **Lucide React** for icons
--   **TypeScript** for type safety
+- **Next.js 15**: App Router, Server Components, client components marked with `"use client"`
+- **State Management**: Zustand stores with persistence (`authStore`, `courseStore`)
+- **Data Fetching**: TanStack Query v5 with configured defaults (1min staleTime, 10min gcTime)
+- **Styling**: TailwindCSS v4 with custom CSS variables (`--color-highlight: #FF6636`, `--color-secondary: #702DFF`)
+- **Animation**: Framer Motion for component transitions
+- **Icons**: Lucide React throughout
 
-### State Management Pattern
+## Component Organization
 
-Uses Zustand stores with specific patterns:
-
--   `useAuthStore` - User authentication and profile data
--   `useCourseStore` - Course data, categories, search, and filtering
--   Stores use `persist` middleware for localStorage persistence
-
-## Project Structure
+Components are organized by **functional domains** in `src/components/dashboard/`:
 
 ```
-src/
-├── app/                    # Next.js App Router
-│   ├── dashboard/         # Protected dashboard routes
-│   │   ├── student/       # Student-specific pages
-│   │   └── teacher/       # Teacher-specific pages (planned)
-│   └── page.tsx          # Landing/login page
-├── components/           # Reusable UI components
-│   ├── ui/              # Base UI components (Button, Input, etc.)
-│   ├── auth/            # Authentication components
-│   └── dashboard/       # Dashboard-specific components
-├── stores/              # Zustand state management
-├── types/               # TypeScript type definitions
-├── data/                # Mock data and fixtures
-├── hooks/               # Custom React hooks
-├── services/            # API service layer
-└── config/              # App configuration
+dashboard/
+├── layout/        # Sidebar, DashboardHeader, StudentDashboard
+├── courses/       # CourseCard, CoursesList, CourseSearch, Categories
+├── classroom/     # Classroom, ClassroomPost, ActivitiesSidebar
+├── learning/      # CourseLearningPage, CourseContents, LectureNotes
+└── shared/        # TabNavigator, reusable components
 ```
 
-## Key Patterns
-
-### Component Organization
-
--   **Barrel exports**: Each component folder has `index.ts` for clean imports
--   **Componentized architecture**: UI broken into reusable pieces (CourseCard, Categories, etc.)
--   **TypeScript interfaces**: All props and data structures are typed
-
-### Authentication Flow
-
+**Import Pattern**: Use barrel exports via `index.ts` files:
 ```typescript
-// Auto-login demo user on page load
-useEffect(() => {
-    if (!isAuthenticated) {
-        login({
-            id: "1",
-            name: "Natália Ruth",
-            email: "natalia@email.com",
-            role: "student",
-        });
-    }
-}, [isAuthenticated, login]);
+import { CourseCard, CoursesList } from '@/components/dashboard/courses';
+import { Classroom, ClassroomPost } from '@/components/dashboard/classroom';
 ```
 
-### Route Protection
+## Authentication Flow
 
--   Dashboard routes use `layout.tsx` to check authentication
--   Redirects to login if not authenticated
--   Separate student/teacher dashboard paths
+- **Auto-login**: `src/app/page.tsx` simulates login for demo (`login()` in useEffect)
+- **Route Protection**: `src/app/dashboard/layout.tsx` checks `isAuthenticated` and redirects
+- **Zustand Persistence**: Auth state persists to localStorage via `persist` middleware
+- **User Roles**: `"student" | "teacher"` determine dashboard access
 
-### Data Flow
+## Data Patterns
 
-1. Mock data in `src/data/mockData.ts` simulates API responses
-2. Zustand stores manage global state
-3. Components subscribe to stores for reactive updates
-4. Search and filtering handled in store computed functions
+### Mock Data Structure
+- **Courses**: `src/data/mockData.ts` - contains `mockCourses[]` and `mockCategories[]`
+- **Classroom**: `src/components/dashboard/classroom/classroomTypes.ts` - posts and activities
+- **Typing**: Interfaces co-located with components (e.g., `ClassroomPost`, `Activity`)
+
+### State Management
+```typescript
+// Zustand stores follow this pattern:
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
+      // state and actions
+    }),
+    { name: "auth-storage", storage: createJSONStorage(() => localStorage) }
+  )
+);
+```
+
+## Classroom Component System
+
+The **Classroom** is a complex component with:
+- **Posts**: Three types (`"announcement" | "assignment" | "material"`)
+- **Comments**: Support line breaks via `whitespace-pre-wrap`, Enter/Shift+Enter UX
+- **Activities Sidebar**: Right-aligned activities panel
+- **State Management**: Local state for comments, passed via props to child components
 
 ## Development Commands
 
 ```bash
-yarn dev          # Start development server with Turbopack
+yarn dev          # Development with Turbopack
 yarn build        # Production build
-yarn lint         # ESLint checking
+yarn lint         # ESLint
 ```
 
-## Custom Styles
+## UI/UX Patterns
 
-Uses TailwindCSS with custom theme colors:
+### Design System
+- **Orange Theme**: Primary `#FF6636`, Secondary `#702DFF`
+- **Gradient Avatars**: `bg-gradient-to-br from-orange-400 to-red-400`
+- **Cards**: `bg-white rounded-lg shadow-sm border-2 hover:shadow-md`
+- **Buttons**: Orange variants with hover states
 
--   `text-secondary`, `bg-secondary` - Primary brand purple
--   `text-highlight`, `bg-highlight` - Orange accent color
--   Custom gradients for hero sections and cards
+### Animation Patterns
+```typescript
+// Framer Motion standard pattern:
+<motion.div
+  initial={{ opacity: 0, height: 0 }}
+  animate={{ opacity: 1, height: "auto" }}
+  transition={{ duration: 0.3 }}
+>
+```
 
-## Component Patterns
+## File Routing
 
-### Course Cards
+- **Student Routes**: `/dashboard/student/[page]`
+- **Dynamic Routes**: `/dashboard/student/courses/[id]` → `CourseDetailsPage`
+- **Nested Layouts**: Dashboard layout wraps all `/dashboard/*` routes
+- **Page Components**: Thin wrappers importing from `@/components/dashboard`
 
--   Hover effects with `hover:-translate-y-2`
--   Gradient backgrounds for course thumbnails
--   Progress bars for enrolled courses
--   Price formatting with `Intl.NumberFormat`
+## Critical Development Notes
 
-### Search & Filtering
+1. **Component Exports**: Always use barrel exports via `index.ts` files
+2. **State Updates**: Use Zustand actions, not direct state mutation
+3. **TanStack Query**: Leverage configured defaults, avoid overriding staleTime/gcTime
+4. **Comments**: Use `whitespace-pre-wrap` for line break support
+5. **Responsive**: All components should be mobile-first responsive
+6. **Loading States**: Include loading/error states for async operations
 
--   Real-time search in course store
--   Category filtering with visual selection states
--   Combined search + category filtering logic
+## Integration Points
 
-### Icons & Styling
+- **QueryProvider**: Wraps entire app in `src/app/layout.tsx`
+- **Route Guards**: Dashboard layout checks authentication
+- **Mock Services**: `src/services/authService.ts` ready for real API integration
+- **LocalStorage**: Zustand persist middleware for auth state
 
--   Lucide React icons with consistent sizing
--   Rounded corners (`rounded-xl`, `rounded-3xl`)
--   Consistent spacing and shadow patterns
--   Portuguese language for UI text
-
-## Mock Data Structure
-
-Courses have complete metadata including:
-
--   Instructor, rating, student count, duration
--   Enrollment status and progress tracking
--   Category classification and pricing
--   Thumbnail placeholders with consistent styling
-
-## Common Gotchas
-
--   All dashboard pages need `"use client"` directive
--   Zustand stores require proper TypeScript typing
--   Component props interfaces should extend common patterns
--   Mock data simulates real API structure for easy replacement
+When adding new features, follow the established patterns: organize by domain, use TypeScript interfaces, leverage existing state management, and maintain responsive design.

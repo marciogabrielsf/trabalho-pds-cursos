@@ -1,6 +1,6 @@
 import React from "react";
 import { Bell } from "lucide-react";
-import { useAuthStore } from "../../stores/authStore";
+import { useAuthStore } from "@/stores/authStore";
 
 const DashboardHeader: React.FC = () => {
     const { user } = useAuthStore();

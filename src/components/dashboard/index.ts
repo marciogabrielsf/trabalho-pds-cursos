@@ -1,20 +1,14 @@
-export { default as Sidebar } from "./Sidebar";
-export { default as DashboardHeader } from "./DashboardHeader";
-export { default as Categories } from "./Categories";
-export { default as CourseCard } from "./CourseCard";
-export { default as CoursesList } from "./CoursesList";
-export { default as CourseSearch } from "./CourseSearch";
-export { default as StudentDashboard } from "./StudentDashboard";
-export { default as MyCourseCard } from "./MyCourseCard";
-export { default as MyCoursesList } from "./MyCoursesList";
-export { default as MyCoursesPage } from "./MyCoursesPage";
-export { default as CourseHeader } from "./CourseHeader";
-export { default as CourseTabs } from "./CourseTabs";
-export { default as CourseDescription } from "./CourseDescription";
-export { default as PurchasePanel } from "./PurchasePanel";
-export { default as CourseDetailsPage } from "./CourseDetailsPage";
-export { default as CourseLearningPage } from "./CourseLearningPage";
-export { default as CourseContents } from "./CourseContents";
-export { default as LectureNotes } from "./LectureNotes";
-export { default as TabNavigator } from "./TabNavigator";
-export { default as Classroom } from "./Classroom";
+// Layout components
+export * from "./layout";
+
+// Course components
+export * from "./courses";
+
+// Classroom components
+export * from "./classroom";
+
+// Learning components
+export * from "./learning";
+
+// Shared components
+export * from "./shared";

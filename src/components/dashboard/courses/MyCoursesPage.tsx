@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import Sidebar from "./Sidebar";
-import DashboardHeader from "./DashboardHeader";
 import CourseSearch from "./CourseSearch";
 import MyCoursesList from "./MyCoursesList";
-import { Course } from "../../stores/courseStore";
+import { Course } from "@/stores/courseStore";
+import { DashboardHeader, Sidebar } from "@/components";
 
 // Dados mockados dos cursos inscritos
 const myEnrolledCourses: Course[] = [

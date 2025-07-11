@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
-import Sidebar from "./Sidebar";
-import DashboardHeader from "./DashboardHeader";
 import CourseHeader from "./CourseHeader";
 import CourseTabs from "./CourseTabs";
 import CourseDescription from "./CourseDescription";
 import PurchasePanel from "./PurchasePanel";
-import { PaymentOption } from "../ui/PaymentSelector";
-import { mockCourses } from "../../data/mockData";
 import CourseDetailsHorizontal from "./CourseDetailsHorizontal";
+import { mockCourses } from "@/data/mockData";
+import { PaymentOption } from "@/components/ui/PaymentSelector";
+import { DashboardHeader, Sidebar } from "@/components";
 
 const CourseDetailsPage: React.FC = () => {
     const params = useParams();
@@ -131,7 +130,7 @@ const CourseDetailsPage: React.FC = () => {
                 </motion.div>
 
                 <main className="px-6 pb-10">
-                    <CourseDetailsHorizontal course={course} />;
+                    <CourseDetailsHorizontal course={course} />
                     <motion.div
                         className="grid grid-cols-1 lg:grid-cols-3 gap-8"
                         variants={itemVariants}
