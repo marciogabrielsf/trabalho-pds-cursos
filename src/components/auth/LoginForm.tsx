@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
-import Checkbox from "../ui/Checkbox";
 import { LoginFormData, LoginFormProps } from "@/types/auth";
 import { ArrowRight } from "lucide-react";
 
@@ -85,13 +84,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading = false }) =>
             </div>
 
             <div className="flex items-center justify-between">
-                <div>
+                {/* <div>
                     <Checkbox
                         label="Lembre de mim"
                         checked={formData.lembrarDeMin}
                         onChange={handleInputChange("lembrarDeMin")}
                     />
-                </div>
+                </div> */}
 
                 <div>
                     <Button type="submit" isLoading={isLoading}>

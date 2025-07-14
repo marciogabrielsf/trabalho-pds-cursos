@@ -62,17 +62,6 @@ const LoginPage: React.FC = () => {
                             )}
 
                             <LoginForm onSubmit={handleLogin} isLoading={isLoading} />
-
-                            <div className="mt-6 text-center text-sm text-gray-500">
-                                <p>
-                                    <strong>Dica:</strong> Use qualquer email válido e uma senha com
-                                    pelo menos 6 caracteres.
-                                </p>
-                                <p className="mt-1">
-                                    Emails contendo &quot;teacher&quot; serão redirecionados para o
-                                    dashboard do professor.
-                                </p>
-                            </div>
                         </div>
                     </div>
                 </div>
