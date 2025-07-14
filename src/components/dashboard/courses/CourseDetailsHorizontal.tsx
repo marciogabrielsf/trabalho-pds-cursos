@@ -1,16 +1,10 @@
+import { Course } from "@/types/course";
 import { motion } from "framer-motion";
 import { BarChart, BookOpen, FileStack, GraduationCap } from "lucide-react";
 import React from "react";
 
 type CourseDetailsHorizontalProps = {
-    course: {
-        title: string;
-        instructor: string;
-        category: string;
-        lessonsCount: number;
-        studentsCount: number;
-        level: string;
-    };
+    course: Course;
 };
 
 export default function CourseDetailsHorizontal({ course }: CourseDetailsHorizontalProps) {
@@ -46,25 +40,26 @@ export default function CourseDetailsHorizontal({ course }: CourseDetailsHorizon
                     <span className="p-2 bg-white/30 rounded-xl font-semibold">
                         {course.category}
                     </span>
-                    <p>Por: {course.instructor}</p>
+                    <p>Por: {course.teacher.name}</p>
                 </div>
                 <h1 className=" font-semibold text-3xl">{course.title}</h1>
                 <div className="flex gap-3 text-[#9D9D9D] text-xs">
                     <div className="flex items-center gap-2">
                         <BookOpen className="text-highlight" />
-                        <span>{course.lessonsCount} Aulas</span>
+                        <span>{1} Aulas</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <GraduationCap className="text-highlight" />
-                        <span>{course.studentsCount} Alunos Matriculados</span>
+                        <span>{10} Alunos Matriculados</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <BarChart className="text-highlight" />
-                        <span>{course.level}</span>
+                        {/* <span>{course.level}</span> */}
+                        <span>Iniciante</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <FileStack className="text-highlight" />
-                        <span>{course.lessonsCount} Aulas</span>
+                        <span>{12} Aulas</span>
                     </div>
                 </div>
             </div>

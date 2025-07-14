@@ -30,7 +30,7 @@ const DashboardHeader: React.FC = () => {
                     </div>
                     <div className="text-left">
                         <p className="text-sm font-medium text-gray-900">
-                            Bem-Vinda, {user?.name || "Usuário"}
+                            Bem-Vindo(a), {user?.name || "Usuário"}
                         </p>
                         <p className="text-xs text-gray-500">{today}</p>
                     </div>

@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
 import CourseContents from "./CourseContents";
 import LectureNotes from "./LectureNotes";
-import { mockCourses } from "@/data/mockData";
 import {
     Classroom,
     CourseDetailsHorizontal,
@@ -92,27 +91,27 @@ const CourseLearningPage: React.FC = () => {
     const [modules, setModules] = useState(mockModules);
     const [activeTab, setActiveTab] = useState("videos");
 
-    const courseId = params.id as string;
-    const course = mockCourses.find((c) => c.id === courseId);
+    const courseId = Number(params.id);
+    // const course = mockCourses.find((c) => c.id === courseId);
 
-    if (!course) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">Curso não encontrado</h1>
-                    <p className="text-gray-600 mb-4">
-                        O curso que você está procurando não existe.
-                    </p>
-                    <button
-                        onClick={() => router.back()}
-                        className="text-orange-500 hover:text-orange-600"
-                    >
-                        Voltar
-                    </button>
-                </div>
-            </div>
-        );
-    }
+    // if (!course) {
+    //     return (
+    //         <div className="min-h-screen flex items-center justify-center">
+    //             <div className="text-center">
+    //                 <h1 className="text-2xl font-bold text-gray-900 mb-2">Curso não encontrado</h1>
+    //                 <p className="text-gray-600 mb-4">
+    //                     O curso que você está procurando não existe.
+    //                 </p>
+    //                 <button
+    //                     onClick={() => router.back()}
+    //                     className="text-orange-500 hover:text-orange-600"
+    //                 >
+    //                     Voltar
+    //                 </button>
+    //             </div>
+    //         </div>
+    //     );
+    // }
 
     // Configurações de animação
     const springConfig = {

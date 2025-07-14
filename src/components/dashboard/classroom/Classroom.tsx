@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import ClassroomPost from "./ClassroomPost";
 import ActivitiesSidebar from "./ActivitiesSidebar";

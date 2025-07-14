@@ -1,6 +1,4 @@
-// Re-exports dos hooks do TanStack Query
-export * from "./useUser";
-export * from "./useCourses";
+export * from "./useCourseQuery";
 
 // Hook simplificado para autenticação local (baseado no Zustand)
 import { useAuthStore } from "@/stores/authStore";

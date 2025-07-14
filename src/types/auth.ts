@@ -4,7 +4,7 @@ export interface LoginFormData {
     lembrarDeMin: boolean;
 }
 
-export interface LoginFormProps {
-    onSubmit: (data: LoginFormData) => void;
-    isLoading?: boolean;
+export interface LoginRequest {
+    email: string;
+    password: string;
 }

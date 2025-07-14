@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp, Users, Clock, BarChart, NotepadText } from "lucide-react";
-import PaymentSelector from "@/components/ui/PaymentSelector";
+import PaymentSelector, { PaymentOption } from "@/components/ui/PaymentSelector";
 import { Button } from "@/components/ui";
 
 interface PurchasePanelProps {

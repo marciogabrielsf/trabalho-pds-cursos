@@ -1,34 +1,70 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import Sidebar from "./Sidebar";
 import DashboardHeader from "./DashboardHeader";
-import { Categories, CoursesList, CourseSearch } from "../courses";
-import { useCourseStore } from "../../../stores/courseStore";
-import { mockCategories, mockCourses } from "../../../data/mockData";
+import { Categories, CoursesList, CourseSearch, CourseSkeleton } from "../courses";
+import { useCourseQuery } from "../../../hooks/useCourseQuery";
+import { mockCategories } from "../../../data/mockData";
+import { Course } from "../../../types/course";
 
 const StudentDashboard: React.FC = () => {
     const [activeMenuItem, setActiveMenuItem] = useState("courses");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(0);
 
+    const limit = 10;
+    const offset = currentPage * limit;
+
+    // Buscar cursos com TanStack Query
     const {
-        categories,
-        courses,
-        searchQuery,
-        selectedCategory,
-        setCategories,
-        setCourses,
-        setSearchQuery,
-        setSelectedCategory,
-        getFilteredCourses,
-    } = useCourseStore();
+        data: courseData,
+        isLoading,
+        error,
+        refetch,
+    } = useCourseQuery({
+        search: searchQuery || undefined,
+        limit,
+        offset,
+    });
 
-    // Simular carregamento de dados
-    useEffect(() => {
-        setCategories(mockCategories);
-        setCourses(mockCourses);
-    }, [setCategories, setCourses]);
+    const courses = useMemo(() => courseData || [], [courseData]);
 
-    const filteredCourses = getFilteredCourses();
-    const developmentCourses = courses.filter((course) => course.category === "Development");
+    // Filtrar cursos por categoria localmente (já que a API não suporta filtro por categoria)
+    const filteredCourses = useMemo(() => {
+        if (!selectedCategory) return courses;
+        return courses.filter((course: Course) => course.category === selectedCategory);
+    }, [courses, selectedCategory]);
+
+    const categories = mockCategories;
+
+    // Função para lidar com mudanças na busca
+    const handleSearchChange = (query: string) => {
+        setSearchQuery(query);
+        setCurrentPage(0); // Reset para primeira página
+    };
+
+    // Função para lidar com mudanças na categoria
+    const handleCategoryChange = (categoryId: string | null) => {
+        setSelectedCategory(categoryId);
+        setCurrentPage(0); // Reset para primeira página
+    };
+
+    if (error) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <div className="text-center">
+                    <p className="text-red-500 mb-4">Erro ao carregar os cursos</p>
+                    <button
+                        onClick={() => refetch()}
+                        className="px-4 py-2 bg-secondary text-white rounded hover:bg-secondary/80"
+                    >
+                        Tentar novamente
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     // Configurações de animação
     const springConfig = {
@@ -84,7 +120,7 @@ const StudentDashboard: React.FC = () => {
                         <motion.div variants={itemVariants}>
                             <CourseSearch
                                 searchQuery={searchQuery}
-                                setSearchQuery={setSearchQuery}
+                                setSearchQuery={handleSearchChange}
                             />
                         </motion.div>
 
@@ -92,12 +128,14 @@ const StudentDashboard: React.FC = () => {
                             <Categories
                                 categories={categories}
                                 selectedCategory={selectedCategory}
-                                onCategorySelect={setSelectedCategory}
+                                onCategorySelect={handleCategoryChange}
                             />
                         </motion.div>
 
                         <motion.div variants={itemVariants}>
-                            {searchQuery || selectedCategory ? (
+                            {isLoading ? (
+                                <CourseSkeleton count={8} />
+                            ) : searchQuery || selectedCategory ? (
                                 <CoursesList
                                     courses={filteredCourses}
                                     title={
@@ -115,7 +153,7 @@ const StudentDashboard: React.FC = () => {
                                 />
                             ) : (
                                 <CoursesList
-                                    courses={developmentCourses}
+                                    courses={courses}
                                     title="Cursos Disponíveis"
                                     subtitle="Explore nossos cursos mais populares para uma jornada de aprendizado incrível"
                                 />

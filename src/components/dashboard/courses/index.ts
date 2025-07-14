@@ -3,6 +3,7 @@ export { default as CourseCard } from "./CourseCard";
 export { default as CoursesList } from "./CoursesList";
 export { default as CourseSearch } from "./CourseSearch";
 export { default as Categories } from "./Categories";
+export { default as CourseSkeleton } from "./CourseSkeleton";
 
 // My courses
 export { default as MyCourseCard } from "./MyCourseCard";

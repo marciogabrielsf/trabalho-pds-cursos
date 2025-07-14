@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { Clock, Users, Play } from "lucide-react";
-import { Course } from "../../stores/courseStore";
+import { Course } from "@/types/course";
 
 interface CourseCardProps {
     course: Course;
@@ -14,6 +14,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
             currency: "BRL",
         }).format(price);
     };
+
+    console.log("course", course);
 
     const cardContent = (
         <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg hover:-translate-y-2 transition-all duration-200 cursor-pointer group">
@@ -51,7 +53,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
             {/* Conteúdo do card */}
             <div className="p-4">
                 {/* Instrutor */}
-                <p className="text-sm text-gray-600 mb-2">Por: Prof. {course.instructor}</p>
+                <p className="text-sm text-gray-600 mb-2">Por: Prof. {course.teacher?.name}</p>
 
                 {/* Título */}
                 <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-highlight transition-colors">
@@ -82,15 +84,15 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
                 {/* Preço */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                        {course.originalPrice && (
+                        {course.value && (
                             <span className="text-sm text-gray-400 line-through">
-                                {formatPrice(course.originalPrice)}
+                                {formatPrice(course.value)}
                             </span>
                         )}
-                        <span className="text-lg  text-[#9D9D9D]">{formatPrice(course.price)}</span>
+                        <span className="text-lg  text-[#9D9D9D]">{formatPrice(course.value)}</span>
                     </div>
                     <button className="text-[#55BE24] font-bold cursor-pointer">
-                        {course.isEnrolled ? "Continuar" : "Comprar Curso"}
+                        Comprar Curso
                     </button>
                 </div>
             </div>

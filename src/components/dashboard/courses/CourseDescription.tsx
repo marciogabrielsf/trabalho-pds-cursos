@@ -16,7 +16,7 @@ const CourseDescription: React.FC<CourseDescriptionProps> = ({ description, requ
             </div>
 
             <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Course requirements</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Requisitos do curso</h3>
                 <ul className="space-y-2">
                     {requirements.map((requirement, index) => (
                         <li key={index} className="flex items-start space-x-3">

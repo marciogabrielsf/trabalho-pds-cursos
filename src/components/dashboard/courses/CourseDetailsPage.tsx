@@ -6,32 +6,70 @@ import CourseTabs from "./CourseTabs";
 import CourseDescription from "./CourseDescription";
 import PurchasePanel from "./PurchasePanel";
 import CourseDetailsHorizontal from "./CourseDetailsHorizontal";
-import { mockCourses } from "@/data/mockData";
 import { PaymentOption } from "@/components/ui/PaymentSelector";
 import { DashboardHeader, Sidebar } from "@/components";
+import { useCourseByIdQuery } from "@/hooks/useCourseQuery";
 
 const CourseDetailsPage: React.FC = () => {
     const params = useParams();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState("description");
 
-    const courseId = params.id as string;
-    const course = mockCourses.find((c) => c.id === courseId);
+    const courseId = Number(params.id);
+    const { data: course, isLoading, error, isError } = useCourseByIdQuery(courseId);
 
-    if (!course) {
+    // Loading state
+    if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">Curso não encontrado</h1>
-                    <p className="text-gray-600 mb-4">
-                        O curso que você está procurando não existe.
-                    </p>
-                    <button
-                        onClick={() => router.back()}
-                        className="text-orange-500 hover:text-orange-600"
-                    >
-                        Voltar
-                    </button>
+            <div className="flex bg-white">
+                <Sidebar activeItem="courses" onItemClick={() => {}} />
+                <div className="flex-1 bg-gray-50 overflow-scroll w-full h-screen">
+                    <DashboardHeader />
+                    <main className="px-6 pb-10">
+                        <div className="min-h-screen flex items-center justify-center">
+                            <div className="text-center">
+                                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-orange-500 mx-auto mb-4"></div>
+                                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                                    Carregando curso...
+                                </h1>
+                                <p className="text-gray-600">
+                                    Aguarde enquanto carregamos as informações do curso.
+                                </p>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        );
+    }
+
+    // Error state
+    if (isError || !course) {
+        return (
+            <div className="flex bg-white">
+                <Sidebar activeItem="courses" onItemClick={() => {}} />
+                <div className="flex-1 bg-gray-50 overflow-scroll w-full h-screen">
+                    <DashboardHeader />
+                    <main className="px-6 pb-10">
+                        <div className="min-h-screen flex items-center justify-center">
+                            <div className="text-center">
+                                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                                    {error?.message || "Curso não encontrado"}
+                                </h1>
+                                <p className="text-gray-600 mb-4">
+                                    {error?.message
+                                        ? "Ocorreu um erro ao carregar o curso."
+                                        : "O curso que você está procurando não existe."}
+                                </p>
+                                <button
+                                    onClick={() => router.back()}
+                                    className="text-orange-500 hover:text-orange-600"
+                                >
+                                    Voltar
+                                </button>
+                            </div>
+                        </div>
+                    </main>
                 </div>
             </div>
         );
@@ -106,9 +144,8 @@ const CourseDetailsPage: React.FC = () => {
                 return (
                     <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-4">Sobre o Instrutor</h3>
-                        <p className="text-gray-700">
-                            Informações sobre {course.instructor} serão implementadas aqui.
-                        </p>
+                        <p className="text-gray-700">Autor: {course.teacher.name}</p>
+                        <p className="text-gray-700">E-mail: {course.teacher.email}</p>
                     </div>
                 );
             default:
@@ -150,11 +187,10 @@ const CourseDetailsPage: React.FC = () => {
                         <motion.div className="lg:col-span-1" variants={itemVariants}>
                             <div className="sticky top-6">
                                 <PurchasePanel
-                                    price={course.price}
-                                    originalPrice={course.originalPrice}
+                                    price={course.value}
                                     onPurchase={handlePurchase}
-                                    studentsCount={course.studentsCount}
-                                    lessonsCount={course.lessonsCount}
+                                    studentsCount={10}
+                                    lessonsCount={10}
                                     modulesCount={4}
                                     level="Iniciante e Intermediário"
                                 />
