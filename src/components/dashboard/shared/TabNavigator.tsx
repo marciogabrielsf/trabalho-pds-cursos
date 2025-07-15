@@ -8,7 +8,7 @@ interface TabNavigatorProps {
 
 const TabNavigator: React.FC<TabNavigatorProps> = ({ activeTab, onTabChange }) => {
     const tabs = [
-        { id: "videos", label: "Vídeos aulas" },
+        { id: "videos", label: "Conteúdo" },
         { id: "classroom", label: "Sala de Aula" },
     ];
 

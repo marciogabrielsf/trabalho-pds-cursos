@@ -1,4 +1,4 @@
-import { Course } from "@/types/course";
+import { Course, CourseLearningData } from "@/types/course";
 import { api } from "./api";
 
 interface CourseQueryParams {
@@ -32,6 +32,11 @@ class CourseService {
 
     async getCourseById(courseId: number): Promise<Course> {
         const response = await api.get(`/course/${courseId}`);
+        return response.data;
+    }
+
+    async getCourseForLearning(courseId: number): Promise<CourseLearningData> {
+        const response = await api.get(`/course/${courseId}/learn`);
         return response.data;
     }
 

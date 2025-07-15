@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { courseService } from "@/services/courseService";
-import { Course } from "@/types/course";
+import { Course, CourseLearningData } from "@/types/course";
 
 interface UseCourseQueryParams {
     search?: string;
@@ -28,6 +28,17 @@ export const useCourseByIdQuery = (courseId: number) => {
     return useQuery<Course, Error>({
         queryKey: ["course", courseId],
         queryFn: () => courseService.getCourseById(courseId),
+        staleTime: 1000 * 60, // 1 minuto
+        gcTime: 1000 * 60 * 10, // 10 minutos
+        retry: 1,
+        enabled: !!courseId, // Só executa se courseId existir
+    });
+};
+
+export const useCourseLearningQuery = (courseId: number) => {
+    return useQuery<CourseLearningData, Error>({
+        queryKey: ["course-learning", courseId],
+        queryFn: () => courseService.getCourseForLearning(courseId),
         staleTime: 1000 * 60, // 1 minuto
         gcTime: 1000 * 60 * 10, // 10 minutos
         retry: 1,

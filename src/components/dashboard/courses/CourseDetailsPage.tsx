@@ -175,7 +175,7 @@ const CourseDetailsPage: React.FC = () => {
                         {/* Main content - Video and course info */}
                         <div className="lg:col-span-2">
                             <motion.div variants={itemVariants}>
-                                <CourseHeader trailer_url={course.trailer_url} />
+                                <CourseHeader trailer_url={course.trailer_url || ""} />
                             </motion.div>
                             <motion.div className="mt-8" variants={itemVariants}>
                                 <div className="bg-white rounded-lg p-6">
@@ -189,8 +189,8 @@ const CourseDetailsPage: React.FC = () => {
                                 <PurchasePanel
                                     price={course.value || 0}
                                     onPurchase={handlePurchase}
-                                    studentsCount={10}
-                                    lessonsCount={10}
+                                    studentsCount={course.studentsCount || 0}
+                                    lessonsCount={course.lessonsCount || 0}
                                     modulesCount={4}
                                     level="Iniciante e Intermediário"
                                 />

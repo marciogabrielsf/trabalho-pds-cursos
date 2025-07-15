@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
 import CourseContents from "./CourseContents";
-import LectureNotes from "./LectureNotes";
+import VideoLessonContent from "./VideoLessonContent";
+import TextLessonContent from "./TextLessonContent";
+import QuizLessonContent from "./QuizLessonContent";
 import {
     Classroom,
     CourseDetailsHorizontal,
@@ -10,108 +12,84 @@ import {
     Sidebar,
     TabNavigator,
 } from "@/components";
-
-// Mock data for course modules
-const mockModules = [
-    {
-        id: "1",
-        title: "Getting Started",
-        moduleNumber: 1,
-        lessonsCount: 4,
-        duration: "45 min",
-        completed: 1,
-        total: 4,
-        expanded: true,
-        lessons: [
-            { id: "1", title: "What is Webflow?", duration: "10 min", completed: true },
-            {
-                id: "2",
-                title: "Sign up in Webflow",
-                duration: "8 min",
-                completed: false,
-                current: true,
-            },
-            { id: "3", title: "Teaser of Webflow", duration: "12 min", completed: false },
-            { id: "4", title: "Figma Introduction", duration: "15 min", completed: false },
-        ],
-    },
-    {
-        id: "2",
-        title: "Secret of Good Design",
-        moduleNumber: 2,
-        lessonsCount: 20,
-        duration: "2h 30min",
-        completed: 0,
-        total: 4,
-        expanded: false,
-        lessons: [
-            { id: "5", title: "Design Principles", duration: "15 min", completed: false },
-            { id: "6", title: "Color Theory", duration: "20 min", completed: false },
-            { id: "7", title: "Typography", duration: "18 min", completed: false },
-            { id: "8", title: "Layout and Composition", duration: "25 min", completed: false },
-        ],
-    },
-    {
-        id: "3",
-        title: "Secret of Good Design",
-        moduleNumber: 3,
-        lessonsCount: 20,
-        duration: "2h 30min",
-        completed: 0,
-        total: 4,
-        expanded: false,
-        lessons: [
-            { id: "9", title: "Advanced Techniques", duration: "20 min", completed: false },
-            { id: "10", title: "User Experience", duration: "25 min", completed: false },
-            { id: "11", title: "Responsive Design", duration: "30 min", completed: false },
-            { id: "12", title: "Final Project", duration: "40 min", completed: false },
-        ],
-    },
-    {
-        id: "4",
-        title: "Secret of Good Design",
-        moduleNumber: 4,
-        lessonsCount: 20,
-        duration: "2h 30min",
-        completed: 0,
-        total: 4,
-        expanded: false,
-        lessons: [
-            { id: "13", title: "Portfolio Building", duration: "25 min", completed: false },
-            { id: "14", title: "Client Communication", duration: "20 min", completed: false },
-            { id: "15", title: "Design Systems", duration: "30 min", completed: false },
-            { id: "16", title: "Course Completion", duration: "15 min", completed: false },
-        ],
-    },
-];
+import { useCourseLearningQuery } from "@/hooks/useCourseQuery";
+import { useLessonQuery } from "@/hooks/useLessonQuery";
+import { TextLesson, VideoLesson, QuizLesson } from "@/types/lesson";
 
 const CourseLearningPage: React.FC = () => {
     const params = useParams();
     const router = useRouter();
-    const [modules, setModules] = useState(mockModules);
     const [activeTab, setActiveTab] = useState("videos");
 
     const courseId = Number(params.id);
-    // const course = mockCourses.find((c) => c.id === courseId);
+    const {
+        data: courseLearningData,
+        isLoading,
+        error,
+        isError,
+    } = useCourseLearningQuery(courseId);
 
-    // if (!course) {
-    //     return (
-    //         <div className="min-h-screen flex items-center justify-center">
-    //             <div className="text-center">
-    //                 <h1 className="text-2xl font-bold text-gray-900 mb-2">Curso não encontrado</h1>
-    //                 <p className="text-gray-600 mb-4">
-    //                     O curso que você está procurando não existe.
-    //                 </p>
-    //                 <button
-    //                     onClick={() => router.back()}
-    //                     className="text-orange-500 hover:text-orange-600"
-    //                 >
-    //                     Voltar
-    //                 </button>
-    //             </div>
-    //         </div>
-    //     );
-    // }
+    // Estados para controlar UI
+    const [expandedModules, setExpandedModules] = useState<string[]>(["1"]);
+    const currentLessonId = Number(useParams().lessonId?.toString());
+    const {
+        data: lessonData,
+        isLoading: isLessonLoading,
+        error: lessonError,
+    } = useLessonQuery(currentLessonId);
+
+    // Loading state
+    if (isLoading) {
+        return (
+            <div className="flex min-h-screen bg-gray-50">
+                <Sidebar activeItem="my-courses" onItemClick={() => {}} />
+                <div className="flex-1 flex flex-col h-screen overflow-y-auto">
+                    <DashboardHeader />
+                    <div className="flex-1 flex items-center justify-center">
+                        <div className="text-center">
+                            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-orange-500 mx-auto mb-4"></div>
+                            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                                Carregando curso...
+                            </h1>
+                            <p className="text-gray-600">
+                                Aguarde enquanto carregamos as informações do curso.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Error state
+    if (isError || !courseLearningData) {
+        return (
+            <div className="flex min-h-screen bg-gray-50">
+                <Sidebar activeItem="my-courses" onItemClick={() => {}} />
+                <div className="flex-1 flex flex-col h-screen overflow-y-auto">
+                    <DashboardHeader />
+                    <div className="flex-1 flex items-center justify-center">
+                        <div className="text-center">
+                            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                                {error?.message || "Curso não encontrado"}
+                            </h1>
+                            <p className="text-gray-600 mb-4">
+                                {error?.message
+                                    ? "Ocorreu um erro ao carregar o curso."
+                                    : "O curso que você está procurando não existe."}
+                            </p>
+                            <button
+                                onClick={() => router.back()}
+                                className="text-orange-500 hover:text-orange-600"
+                            >
+                                Voltar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     // Configurações de animação
     const springConfig = {
@@ -141,10 +119,8 @@ const CourseLearningPage: React.FC = () => {
     };
 
     const handleToggleModule = (moduleId: string) => {
-        setModules(
-            modules.map((module) =>
-                module.id === moduleId ? { ...module, expanded: !module.expanded } : module
-            )
+        setExpandedModules((prev) =>
+            prev.includes(moduleId) ? prev.filter((id) => id !== moduleId) : [...prev, moduleId]
         );
     };
 
@@ -153,24 +129,83 @@ const CourseLearningPage: React.FC = () => {
     };
 
     const handleLessonComplete = (moduleId: string, lessonId: string) => {
-        setModules(
-            modules.map((module) =>
-                module.id === moduleId
-                    ? {
-                          ...module,
-                          lessons: module.lessons.map((lesson) =>
-                              lesson.id === lessonId
-                                  ? { ...lesson, completed: !lesson.completed }
-                                  : lesson
-                          ),
-                      }
-                    : module
-            )
-        );
+        console.log(`Complete lesson ${lessonId} in module ${moduleId}`);
     };
 
-    const handleDownload = (fileId: string) => {
-        console.log(`Download file ${fileId}`);
+    const renderLessonContent = () => {
+        if (isLessonLoading) {
+            return (
+                <div className="max-w-4xl">
+                    <div className="animate-pulse">
+                        <div className="h-8 bg-gray-200 rounded-md mb-4"></div>
+                        <div className="h-4 bg-gray-200 rounded-md mb-6"></div>
+                        <div className="space-y-2">
+                            <div className="h-4 bg-gray-200 rounded-md"></div>
+                            <div className="h-4 bg-gray-200 rounded-md"></div>
+                            <div className="h-4 bg-gray-200 rounded-md w-3/4"></div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        if (lessonError) {
+            return (
+                <div className="max-w-4xl">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Erro ao carregar aula</h2>
+                    <p className="text-red-600">
+                        {lessonError.message || "Ocorreu um erro ao carregar o conteúdo da aula."}
+                    </p>
+                </div>
+            );
+        }
+
+        if (!lessonData) {
+            return (
+                <div className="max-w-4xl">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Selecione uma aula</h2>
+                    <p className="text-gray-600">
+                        Escolha uma aula na barra lateral para visualizar o conteúdo.
+                    </p>
+                </div>
+            );
+        }
+
+        // Renderizar componente baseado no tipo da aula
+        switch (lessonData.type) {
+            case "VIDEO":
+                return (
+                    <VideoLessonContent
+                        lesson={lessonData as VideoLesson}
+                        onLessonComplete={handleLessonComplete}
+                    />
+                );
+            case "TEXT":
+                return (
+                    <TextLessonContent
+                        lesson={lessonData as TextLesson}
+                        onLessonComplete={handleLessonComplete}
+                    />
+                );
+            case "QUIZ":
+                return (
+                    <QuizLessonContent
+                        lesson={lessonData as QuizLesson}
+                        onLessonComplete={handleLessonComplete}
+                    />
+                );
+            default:
+                return (
+                    <div className="max-w-4xl">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                            Tipo de aula não suportado
+                        </h2>
+                        <p className="text-gray-600">
+                            Este tipo de aula não é suportado pelo sistema.
+                        </p>
+                    </div>
+                );
+        }
     };
 
     const renderTabContent = () => {
@@ -180,64 +215,25 @@ const CourseLearningPage: React.FC = () => {
                     <div className="flex-1 flex">
                         {/* Main Content */}
                         <div className="flex-[0.7] flex flex-col">
-                            {/* Video Player */}
-                            <motion.div
-                                className="bg-black relative"
-                                variants={itemVariants}
-                                style={{ aspectRatio: "16/9" }}
-                            >
-                                {" "}
-                                <iframe
-                                    className="w-full h-full"
-                                    src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=BosetgPbu-0kDSpu"
-                                ></iframe>{" "}
-                            </motion.div>
-
-                            {/* Lesson Content */}
-                            <motion.div className="flex-1 p-6 " variants={itemVariants}>
-                                <div className="max-w-4xl">
-                                    <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                                        2. Sign up in Webflow
-                                    </h2>
-
-                                    <LectureNotes
-                                        description="We cover everything you need to build your first website. From creating your first page through to uploading your website to the internet. We'll use the world's most popular (and free) web design tool called Visual Studio Code. There are exercises files you can download and then work along with me. At the end of each video I have a downloadable version of where we are in the process so that you can compare your project with mine. This will allow you to see exactly where you might have a problem. We will delve into all the good stuff such as how to create your very own mobile burger menu from scratch learning some basic JavaScript and jQuery."
-                                        notes="In sit aliquet ante. Curabitur mollis accumsan lorem, sed aliquam mauris finibus ut. Phasellus eget in in maximus sagittis. Mauris eget lorem ut justo elementum eleifend congue vitae ante. Praesent tempus, urna et auctor mattis, mauris lorem ut augue lorem, commodo elementum turpis lacus vel nisl. Mauris consequat odio sit amet mattis, a vestibulum augue ac tellus et.
-
-Nullam non quam ut tellus finibus tellus non nec est. Aliquam nunc cursus ut efficitur tacinia.
-• Morbi sit amet lorem tellus. Donec blandit fermentum blandit.
-• Pellentesque lorem tellus, hendrerit quis lorem ut, dignissim consectetur tellus. Donec dignissim purus vel mi.
-• Curabitur pretium placerat tellus ut cursus ut congue elit.
-• Pellentesque lorem tellus, hendrerit quis lorem ut, dignissim consectetur tellus. Donec dignissim purus vel mi.
-• Sed dignissim, libero ut lacinia aliquam, ante tellus tempor mauris, eget suscipit mauris eget quis lectus nunc.
-• Sed dignissim, libero ut lacinia aliquam, ante tellus tempor mauris, eget suscipit mauris eget quis lectus nunc.
-
-Donec congue placerat lorem ipsum congue."
-                                        attachedFiles={[
-                                            {
-                                                id: "1",
-                                                name: "Create account on webflow.pdf",
-                                                size: "1.2 MB",
-                                                type: "pdf",
-                                            },
-                                        ]}
-                                        onDownload={handleDownload}
-                                    />
-                                </div>
+                            {/* Lesson Content based on type */}
+                            <motion.div className="flex-1 p-6" variants={itemVariants}>
+                                {renderLessonContent()}
                             </motion.div>
                         </div>
 
                         {/* Sidebar - Course Contents */}
                         <motion.div
-                            className="w-96 flex-[0.3]  bg-white border-l border-gray-200 p-6 "
+                            className="w-96 flex-[0.3] bg-white border-l border-gray-200 p-6"
                             variants={itemVariants}
                         >
                             <CourseContents
-                                modules={modules}
+                                modules={courseLearningData.course_data.modules}
                                 progress={15}
                                 onLessonClick={handleLessonClick}
                                 onToggleModule={handleToggleModule}
                                 onLessonComplete={handleLessonComplete}
+                                expandedModules={expandedModules}
+                                currentLesson={lessonData}
                             />
                         </motion.div>
                     </div>
@@ -245,7 +241,10 @@ Donec congue placerat lorem ipsum congue."
             case "classroom":
                 return (
                     <div className="flex-1 ">
-                        <Classroom courseTitle={course.title} instructor={course.instructor} />
+                        <Classroom
+                            courseTitle={courseLearningData.title}
+                            instructor={courseLearningData.teacher_name}
+                        />
                     </div>
                 );
             default:
@@ -266,7 +265,7 @@ Donec congue placerat lorem ipsum congue."
                 <DashboardHeader />
 
                 <div className="px-6">
-                    <CourseDetailsHorizontal course={course} />
+                    <CourseDetailsHorizontal courseLearningData={courseLearningData} />
 
                     {/* Tab Navigator */}
                     <motion.div variants={itemVariants}>

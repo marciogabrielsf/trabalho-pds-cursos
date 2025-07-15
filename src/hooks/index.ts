@@ -1,4 +1,5 @@
 export * from "./useCourseQuery";
+export * from "./useLessonQuery";
 
 // Hook simplificado para autenticação local (baseado no Zustand)
 import { useAuthStore } from "@/stores/authStore";

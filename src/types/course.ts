@@ -1,4 +1,5 @@
 import { Teacher } from "./user";
+import { Module } from "./module";
 
 export interface Course {
     id: number;
@@ -14,4 +15,19 @@ export interface Course {
     difficulty?: string;
     studentsCount: number;
     lessonsCount: number;
+}
+
+export interface CourseLearningData {
+    id: number;
+    title: string;
+    description: string;
+    value: number;
+    teacher_name: string;
+    trailer_url: string;
+    thumbnail_url: string;
+    difficulty: string;
+    category: string;
+    course_data: {
+        modules: Module[];
+    };
 }

@@ -1,13 +1,18 @@
 import { Course } from "@/types/course";
+import { CourseLearningData } from "@/types/course";
 import { motion } from "framer-motion";
 import { BarChart, BookOpen, FileStack, GraduationCap } from "lucide-react";
 import React from "react";
 
 type CourseDetailsHorizontalProps = {
-    course: Course;
+    course?: Course;
+    courseLearningData?: CourseLearningData;
 };
 
-export default function CourseDetailsHorizontal({ course }: CourseDetailsHorizontalProps) {
+export default function CourseDetailsHorizontal({
+    course,
+    courseLearningData,
+}: CourseDetailsHorizontalProps) {
     const springConfig = {
         type: "spring" as const,
         stiffness: 100,
@@ -22,6 +27,31 @@ export default function CourseDetailsHorizontal({ course }: CourseDetailsHorizon
             transition: springConfig,
         },
     };
+
+    const getDifficultyLabel = (difficulty: string) => {
+        switch (difficulty) {
+            case "begineer":
+                return "Fácil";
+            case "intermediate":
+                return "Intermediário";
+            case "advanced":
+                return "Avançado";
+        }
+    };
+
+    // Use dados do courseLearningData se disponível, senão use course
+    const courseData = courseLearningData || course;
+    if (!courseData) return null;
+
+    const lessonsCount = courseLearningData
+        ? courseLearningData.course_data.modules.reduce(
+              (acc, module) => acc + module.lesson_quantity,
+              0
+          )
+        : course?.lessonsCount || 0;
+
+    const teacherName =
+        courseLearningData?.teacher_name || course?.teacher?.name || course?.teacher_name;
 
     return (
         <motion.div
@@ -38,28 +68,27 @@ export default function CourseDetailsHorizontal({ course }: CourseDetailsHorizon
             <div className="flex flex-col gap-3">
                 <div className="flex gap-3 items-center">
                     <span className="capitalize p-2 bg-white/30 rounded-xl font-semibold">
-                        {course.category}
+                        {courseData.category}
                     </span>
-                    <p>Por: {course.teacher?.name}</p>
+                    <p>Por: {teacherName}</p>
                 </div>
-                <h1 className=" font-semibold text-3xl">{course.title}</h1>
+                <h1 className=" font-semibold text-3xl">{courseData.title}</h1>
                 <div className="flex gap-3 text-[#9D9D9D] text-xs">
                     <div className="flex items-center gap-2">
                         <BookOpen className="text-highlight" />
-                        <span>{1} Aulas</span>
+                        <span>{lessonsCount} Aulas</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <GraduationCap className="text-highlight" />
-                        <span>{10} Alunos Matriculados</span>
+                        <span>{course?.studentsCount || 0} Alunos Matriculados</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <BarChart className="text-highlight" />
-                        {/* <span>{course.level}</span> */}
-                        <span>Iniciante</span>
+                        <span>{getDifficultyLabel(courseData.difficulty || "begineer")}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <FileStack className="text-highlight" />
-                        <span>{12} Aulas</span>
+                        <span>{lessonsCount} Aulas</span>
                     </div>
                 </div>
             </div>
