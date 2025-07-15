@@ -7,9 +7,9 @@ export const mockCategories = [
         coursesCount: 38,
     },
     {
-        id: "development",
-        name: "Development",
-        icon: "development",
+        id: "programming",
+        name: "Programming",
+        icon: "programming",
         coursesCount: 42,
     },
     {

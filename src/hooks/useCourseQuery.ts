@@ -34,3 +34,14 @@ export const useCourseByIdQuery = (courseId: number) => {
         enabled: !!courseId, // Só executa se courseId existir
     });
 };
+
+export const useStudentCoursesQuery = (studentId: number, params: UseCourseQueryParams = {}) => {
+    return useQuery<Course[], Error>({
+        queryKey: ["student-courses", studentId, params],
+        queryFn: () => courseService.getStudentCourses(studentId, params),
+        staleTime: 1000 * 60, // 1 minuto
+        gcTime: 1000 * 60 * 10, // 10 minutos
+        retry: 1,
+        enabled: !!studentId, // Só executa se studentId existir
+    });
+};

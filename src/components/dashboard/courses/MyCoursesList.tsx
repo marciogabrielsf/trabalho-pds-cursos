@@ -1,6 +1,6 @@
 import React from "react";
 import MyCourseCard from "./MyCourseCard";
-import { Course } from "../../stores/courseStore";
+import { Course } from "@/types/course";
 
 interface MyCoursesListProps {
     courses: Course[];

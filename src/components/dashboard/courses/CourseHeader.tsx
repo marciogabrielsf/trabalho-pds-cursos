@@ -1,11 +1,15 @@
 import React from "react";
 
-const CourseHeader: React.FC = () => {
+type CourseHeaderProps = {
+    trailer_url?: string;
+};
+
+const CourseHeader: React.FC<CourseHeaderProps> = ({ trailer_url }) => {
     return (
         <div className="relative aspect-video bg-gradient-to-br from-blue-600 to-purple-700 rounded-xl overflow-hidden">
             <iframe
                 className="w-full h-full"
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=BosetgPbu-0kDSpu"
+                src={trailer_url || "https://www.youtube.com/embed/dQw4w9WgXcQ?si=BosetgPbu-0kDSpu"}
             ></iframe>{" "}
         </div>
     );

@@ -37,10 +37,10 @@ export default function CourseDetailsHorizontal({ course }: CourseDetailsHorizon
                         </button> */}
             <div className="flex flex-col gap-3">
                 <div className="flex gap-3 items-center">
-                    <span className="p-2 bg-white/30 rounded-xl font-semibold">
+                    <span className="capitalize p-2 bg-white/30 rounded-xl font-semibold">
                         {course.category}
                     </span>
-                    <p>Por: {course.teacher.name}</p>
+                    <p>Por: {course.teacher?.name}</p>
                 </div>
                 <h1 className=" font-semibold text-3xl">{course.title}</h1>
                 <div className="flex gap-3 text-[#9D9D9D] text-xs">

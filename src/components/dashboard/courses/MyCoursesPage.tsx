@@ -1,96 +1,67 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import CourseSearch from "./CourseSearch";
 import MyCoursesList from "./MyCoursesList";
-import { Course } from "@/stores/courseStore";
 import { DashboardHeader, Sidebar } from "@/components";
-
-// Dados mockados dos cursos inscritos
-const myEnrolledCourses: Course[] = [
-    {
-        id: "1",
-        title: "Design A Website With ThinkPress",
-        description: "Crie designs incríveis e funcionais para websites modernos",
-        instructor: "Paulo Henrique",
-        rating: 4.9,
-        studentsCount: 89,
-        lessonsCount: 156,
-        duration: "10 horas",
-        price: 79.9,
-        thumbnail: "/course1.jpg",
-        category: "Design",
-        level: "Beginner",
-        isEnrolled: true,
-        progress: 45,
-    },
-    {
-        id: "2",
-        title: "Design A Website With ThinkPress",
-        description: "Versão avançada do curso de design web",
-        instructor: "Paulo Henrique",
-        rating: 4.8,
-        studentsCount: 124,
-        lessonsCount: 156,
-        duration: "12 horas",
-        price: 89.9,
-        thumbnail: "/course2.jpg",
-        category: "Design",
-        level: "Intermediate",
-        isEnrolled: true,
-        progress: 78,
-    },
-    {
-        id: "3",
-        title: "Design A Website With ThinkPress",
-        description: "Curso completo de design para iniciantes",
-        instructor: "Paulo Henrique",
-        rating: 4.7,
-        studentsCount: 95,
-        lessonsCount: 156,
-        duration: "8 horas",
-        price: 69.9,
-        thumbnail: "/course3.jpg",
-        category: "Design",
-        level: "Beginner",
-        isEnrolled: true,
-        progress: 100,
-    },
-    {
-        id: "4",
-        title: "Design A Website With ThinkPress",
-        description: "Especialização em design responsivo",
-        instructor: "Paulo Henrique",
-        rating: 4.6,
-        studentsCount: 67,
-        lessonsCount: 156,
-        duration: "15 horas",
-        price: 99.9,
-        thumbnail: "/course4.jpg",
-        category: "Design",
-        level: "Advanced",
-        isEnrolled: true,
-        progress: 32,
-    },
-];
+import { useStudentCoursesQuery } from "@/hooks/useCourseQuery";
+import { useAuthStore } from "@/stores/authStore";
+import { Course } from "@/types/course";
+import { CourseSkeleton } from "./index";
 
 const MyCoursesPage: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState("");
-    const [filteredCourses, setFilteredCourses] = useState<Course[]>(myEnrolledCourses);
+    const [currentPage, setCurrentPage] = useState(0);
 
-    // Filtrar cursos baseado na busca
-    useEffect(() => {
-        if (!searchQuery.trim()) {
-            setFilteredCourses(myEnrolledCourses);
-        } else {
-            const filtered = myEnrolledCourses.filter(
-                (course) =>
-                    course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    course.instructor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    course.category.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            setFilteredCourses(filtered);
-        }
-    }, [searchQuery]);
+    const { user } = useAuthStore();
+    const limit = 10;
+    const offset = currentPage * limit;
+
+    // Buscar cursos do estudante com TanStack Query
+    const {
+        data: courseData,
+        isLoading,
+        error,
+        refetch,
+    } = useStudentCoursesQuery(user?.id || 0, {
+        search: searchQuery || undefined,
+        limit,
+        offset,
+    });
+
+    const courses = useMemo(() => courseData || [], [courseData]);
+
+    // Filtrar cursos baseado na busca (filtro adicional local se necessário)
+    const filteredCourses = useMemo(() => {
+        if (!searchQuery.trim()) return courses;
+        return courses.filter(
+            (course) =>
+                course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                course.teacher?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                course.category.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }, [courses, searchQuery]);
+
+    // Função para lidar com mudanças na busca
+    const handleSearchChange = (query: string) => {
+        setSearchQuery(query);
+        setCurrentPage(0); // Reset para primeira página
+    };
+
+    if (error) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <div className="text-center">
+                    <p className="text-red-500 mb-4">Erro ao carregar seus cursos</p>
+                    <button
+                        onClick={() => refetch()}
+                        className="px-4 py-2 bg-secondary text-white rounded hover:bg-secondary/80"
+                    >
+                        Tentar novamente
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     // Configurações de animação
     const springConfig = {
@@ -151,15 +122,19 @@ const MyCoursesPage: React.FC = () => {
                         <motion.div variants={itemVariants}>
                             <CourseSearch
                                 searchQuery={searchQuery}
-                                setSearchQuery={setSearchQuery}
+                                setSearchQuery={handleSearchChange}
                             />
                         </motion.div>
 
                         <motion.div variants={itemVariants}>
-                            <MyCoursesList
-                                courses={filteredCourses}
-                                onCourseClick={handleCourseClick}
-                            />
+                            {isLoading ? (
+                                <CourseSkeleton count={8} />
+                            ) : (
+                                <MyCoursesList
+                                    courses={filteredCourses}
+                                    onCourseClick={handleCourseClick}
+                                />
+                            )}
                         </motion.div>
                     </main>
                 </div>

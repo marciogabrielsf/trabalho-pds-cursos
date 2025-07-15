@@ -144,8 +144,8 @@ const CourseDetailsPage: React.FC = () => {
                 return (
                     <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-4">Sobre o Instrutor</h3>
-                        <p className="text-gray-700">Autor: {course.teacher.name}</p>
-                        <p className="text-gray-700">E-mail: {course.teacher.email}</p>
+                        <p className="text-gray-700">Autor: {course.teacher?.name}</p>
+                        <p className="text-gray-700">E-mail: {course.teacher?.email}</p>
                     </div>
                 );
             default:
@@ -175,7 +175,7 @@ const CourseDetailsPage: React.FC = () => {
                         {/* Main content - Video and course info */}
                         <div className="lg:col-span-2">
                             <motion.div variants={itemVariants}>
-                                <CourseHeader />
+                                <CourseHeader trailer_url={course.trailer_url} />
                             </motion.div>
                             <motion.div className="mt-8" variants={itemVariants}>
                                 <div className="bg-white rounded-lg p-6">
@@ -187,7 +187,7 @@ const CourseDetailsPage: React.FC = () => {
                         <motion.div className="lg:col-span-1" variants={itemVariants}>
                             <div className="sticky top-6">
                                 <PurchasePanel
-                                    price={course.value}
+                                    price={course.value || 0}
                                     onPurchase={handlePurchase}
                                     studentsCount={10}
                                     lessonsCount={10}

@@ -34,6 +34,22 @@ class CourseService {
         const response = await api.get(`/course/${courseId}`);
         return response.data;
     }
+
+    async getStudentCourses(studentId: number, params: CourseQueryParams = {}): Promise<Course[]> {
+        const { search, limit = 10, offset = 0 } = params;
+
+        const queryParams = new URLSearchParams();
+
+        if (search) {
+            queryParams.append("search", search);
+        }
+
+        queryParams.append("limit", limit.toString());
+        queryParams.append("offset", offset.toString());
+
+        const response = await api.get(`/student/${studentId}/courses?${queryParams.toString()}`);
+        return response.data;
+    }
 }
 
 export const courseService = new CourseService();
