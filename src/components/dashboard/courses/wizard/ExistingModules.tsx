@@ -114,7 +114,7 @@ export default function ExistingModules({ data, onChange }: ExistingModulesProps
                             className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
                         >
                             <div className="flex items-center space-x-3">
-                                <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm">
+                                <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center text-white text-sm">
                                     {data.selectedModules.indexOf(moduleId) + 1}
                                 </div>
                                 <div>

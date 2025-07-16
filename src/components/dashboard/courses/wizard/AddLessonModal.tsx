@@ -190,11 +190,11 @@ export default function AddLessonModal({
             return (
                 <div className="space-y-6">
                     <div className="flex items-center space-x-4 mb-6">
-                        <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm">
+                        <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center text-white text-sm">
                             1
                         </div>
                         <span className="text-sm font-medium">Módulo</span>
-                        <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm">
+                        <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center text-white text-sm">
                             2
                         </div>
                         <span className="text-sm font-medium">
@@ -399,7 +399,7 @@ export default function AddLessonModal({
                             <Button
                                 type="button"
                                 onClick={handleNext}
-                                className="bg-purple-600 hover:bg-purple-700"
+                                className="bg-secondary hover:bg-purple-700"
                             >
                                 CONTINUAR
                             </Button>
@@ -407,7 +407,7 @@ export default function AddLessonModal({
                             <Button
                                 type="button"
                                 onClick={handleSubmit}
-                                className="bg-purple-600 hover:bg-purple-700"
+                                className="bg-secondary hover:bg-purple-700"
                             >
                                 {initialData ? "Salvar Alterações" : "ADICIONAR AULA"}
                             </Button>

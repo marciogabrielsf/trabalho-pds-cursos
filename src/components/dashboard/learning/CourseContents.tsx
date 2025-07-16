@@ -12,9 +12,14 @@ interface CourseContentsProps {
     onLessonComplete?: (moduleId: string, lessonId: string) => void;
     expandedModules?: string[];
     currentLesson?: Lesson;
+    isTeacher?: boolean;
 }
 
-const getLessonURL = (moduleId: string, lessonId: string) => {
+const getLessonURL = (moduleId: string, lessonId: string, isTeacher: boolean) => {
+    if (isTeacher) {
+        return `/dashboard/teacher/course/${moduleId}/lesson/${lessonId}`;
+    }
+
     return `/dashboard/student/my-courses/${moduleId}/lesson/${lessonId}`;
 };
 
@@ -38,6 +43,7 @@ const CourseContents: React.FC<CourseContentsProps> = ({
     onLessonComplete,
     expandedModules = [],
     currentLesson,
+    isTeacher = false,
 }) => {
     const itemVariants = {
         initial: { opacity: 0, y: 10 },
@@ -57,24 +63,29 @@ const CourseContents: React.FC<CourseContentsProps> = ({
             className="bg-white rounded-lg sticky top-5 shadow-sm border border-gray-200 p-6"
             variants={itemVariants}
         >
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900">Course Contents</h2>
-                <div className="flex items-center space-x-2">
-                    <span className="text-sm text-green-600 font-medium">
-                        {progress}% Completed
-                    </span>
-                </div>
-            </div>
-
             {/* Progress Bar */}
-            <div className="mb-6">
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                        className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${progress}%` }}
-                    />
-                </div>
-            </div>
+
+            {!isTeacher && (
+                <>
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-xl font-bold text-gray-900">Course Contents</h2>
+                        <div className="flex items-center space-x-2">
+                            <span className="text-sm text-green-600 font-medium">
+                                {progress}% Completed
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="mb-6">
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                                className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${progress}%` }}
+                            />
+                        </div>
+                    </div>
+                </>
+            )}
 
             {/* Modules */}
             <div>
@@ -155,7 +166,8 @@ const CourseContents: React.FC<CourseContentsProps> = ({
                                             <a
                                                 href={getLessonURL(
                                                     module.id.toString(),
-                                                    lesson.id.toString()
+                                                    lesson.id.toString(),
+                                                    isTeacher
                                                 )}
                                                 key={lesson.id}
                                                 className={`flex items-center space-x-3 p-3 transition-all duration-200   ${
@@ -164,20 +176,22 @@ const CourseContents: React.FC<CourseContentsProps> = ({
                                                         : "hover:bg-gray-50"
                                                 }`}
                                             >
-                                                <div className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={false} // Será baseado no progresso do usuário
-                                                        onChange={(e) => {
-                                                            e.stopPropagation();
-                                                            onLessonComplete?.(
-                                                                module.id.toString(),
-                                                                lesson.id.toString()
-                                                            );
-                                                        }}
-                                                        className="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500 focus:ring-2"
-                                                    />
-                                                </div>
+                                                {!isTeacher && (
+                                                    <div className="flex items-center">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={false} // Será baseado no progresso do usuário
+                                                            onChange={(e) => {
+                                                                e.stopPropagation();
+                                                                onLessonComplete?.(
+                                                                    module.id.toString(),
+                                                                    lesson.id.toString()
+                                                                );
+                                                            }}
+                                                            className="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500 focus:ring-2"
+                                                        />
+                                                    </div>
+                                                )}
                                                 <div className="flex-1 flex items-center justify-between">
                                                     <div className="flex items-center space-x-2">
                                                         <span

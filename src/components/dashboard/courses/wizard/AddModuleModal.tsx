@@ -190,7 +190,7 @@ export default function AddModuleModal({
                                     className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                                 >
                                     <div className="flex items-center space-x-3">
-                                        <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs">
+                                        <div className="w-6 h-6 bg-secondary rounded-full flex items-center justify-center text-white text-xs">
                                             {lesson.order}
                                         </div>
                                         <div>
@@ -225,7 +225,7 @@ export default function AddModuleModal({
                         <Button type="button" variant="secondary" onClick={onClose}>
                             Cancelar
                         </Button>
-                        <Button type="submit" className="bg-purple-600 hover:bg-purple-700">
+                        <Button type="submit" className="bg-secondary hover:bg-purple-700">
                             {initialData ? "Salvar Alterações" : "Criar Módulo"}
                         </Button>
                     </DialogFooter>

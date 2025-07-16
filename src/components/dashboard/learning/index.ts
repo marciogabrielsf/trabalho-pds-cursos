@@ -1,6 +1,9 @@
 export { default as CourseLearningPage } from "./CourseLearningPage";
+export { default as TeacherCourseLearningPage } from "./TeacherCourseLearningPage";
+export { default as TeacherCourseOverview } from "./TeacherCourseOverview";
 export { default as CourseContents } from "./CourseContents";
 export { default as LectureNotes } from "./LectureNotes";
 export { default as VideoLessonContent } from "./VideoLessonContent";
 export { default as TextLessonContent } from "./TextLessonContent";
 export { default as QuizLessonContent } from "./QuizLessonContent";
+export { default as LessonAnalyticsModal } from "./LessonAnalyticsModal";

@@ -51,7 +51,7 @@ const VideoLessonContent: React.FC<VideoLessonContentProps> = ({ lesson, onLesso
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">
                     {lesson.order}. {lesson.title}
                 </h2>
-                p
+
                 {lesson.description && (
                     <p className="text-gray-600 mb-4 whitespace-pre-line">{lesson.description}</p>
                 )}

@@ -1,5 +1,5 @@
 import React from "react";
-import { BookOpen, LogOut, Settings, User } from "lucide-react";
+import { BookOpen, LogOut, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { APP_NAME } from "@/config/config";
 import { useAuthStore } from "@/stores/authStore";
@@ -25,13 +25,6 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ activeItem = "courses",
             icon: BookOpen,
             isActive: activeItem === "courses",
             path: "/dashboard/teacher",
-        },
-        {
-            id: "my-courses",
-            label: "Meus Cursos",
-            icon: User,
-            isActive: activeItem === "my-courses",
-            path: "/dashboard/teacher/my-courses",
         },
     ];
 

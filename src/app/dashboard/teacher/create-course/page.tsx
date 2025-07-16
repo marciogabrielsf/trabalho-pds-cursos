@@ -295,7 +295,7 @@ export default function CreateCoursePage() {
                             <div className="bg-purple-50 rounded-lg p-4">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-sm text-purple-600">Novos Módulos</p>
+                                        <p className="text-sm text-secondary">Novos Módulos</p>
                                         <p className="text-2xl font-bold text-purple-800">
                                             {prepareDataForAPI.stats.newModules}
                                         </p>
@@ -333,7 +333,7 @@ export default function CreateCoursePage() {
                                             key={item.id}
                                             className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
                                         >
-                                            <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                                            <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center text-white text-sm font-medium">
                                                 {index + 1}
                                             </div>
                                             <div className="flex-1">
@@ -441,7 +441,7 @@ export default function CreateCoursePage() {
                                     <div
                                         className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                                             currentStep >= step.id
-                                                ? "bg-purple-600 text-white"
+                                                ? "bg-secondary text-white"
                                                 : "bg-gray-200 text-gray-600"
                                         }`}
                                     >
@@ -461,7 +461,7 @@ export default function CreateCoursePage() {
                                         <div
                                             className={`h-0.5 ${
                                                 currentStep > step.id
-                                                    ? "bg-purple-600"
+                                                    ? "bg-secondary"
                                                     : "bg-gray-200"
                                             }`}
                                         />
