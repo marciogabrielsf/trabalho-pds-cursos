@@ -68,7 +68,7 @@ export default function CourseDetailsHorizontal({
             <div className="flex flex-col gap-3">
                 <div className="flex gap-3 items-center">
                     <span className="capitalize p-2 bg-white/30 rounded-xl font-semibold">
-                        {courseData.category}
+                        {courseData.category.toLowerCase()}
                     </span>
                     <p>Por: {teacherName}</p>
                 </div>

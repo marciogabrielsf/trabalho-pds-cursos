@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { courseService } from "@/services/courseService";
 import { Course, CourseLearningData } from "@/types/course";
+import { Module } from "@/types/module";
 
 interface UseCourseQueryParams {
     search?: string;
@@ -54,5 +55,16 @@ export const useStudentCoursesQuery = (studentId: number, params: UseCourseQuery
         gcTime: 1000 * 60 * 10, // 10 minutos
         retry: 1,
         enabled: !!studentId, // Só executa se studentId existir
+    });
+};
+
+export const useCourseModulesQuery = (courseId: number) => {
+    return useQuery<Module[], Error>({
+        queryKey: ["course-modules", courseId],
+        queryFn: () => courseService.getCourseModules(courseId),
+        staleTime: 1000 * 60, // 1 minuto
+        gcTime: 1000 * 60 * 10, // 10 minutos
+        retry: 1,
+        enabled: !!courseId, // Só executa se courseId existir
     });
 };

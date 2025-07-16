@@ -20,7 +20,10 @@ const MyCourseCard: React.FC<MyCourseCardProps> = ({ course }) => {
     };
 
     return (
-        <Link href={`/dashboard/student/my-courses/${course.id}`} className="block">
+        <Link
+            href={`/dashboard/student/my-courses/${course.id}/lesson/${course.firstLessonId || 0}`}
+            className="block"
+        >
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200 cursor-pointer">
                 <div className="flex min-h-52">
                     {/* Imagem do curso */}

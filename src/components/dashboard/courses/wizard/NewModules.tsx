@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { CourseWizardData } from "@/app/dashboard/teacher/create-course/page";
+import { CourseWizardData } from "@/types/courseWizard";
 import { Plus, Edit, Trash2, Menu } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { useTeacherModules } from "@/hooks/useModuleQuery";

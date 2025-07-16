@@ -49,40 +49,73 @@ export default function AddLessonModal({
         }[]
     >([]);
 
-    // Update lessonData when initialData changes
+    // Update lessonData when initialData changes or when modal opens
     useEffect(() => {
-        if (initialData) {
-            setLessonData(initialData);
-            setLessonType(initialData.type);
+        console.log("=== AddLessonModal useEffect ===");
+        console.log("isOpen:", isOpen);
+        console.log("initialData:", initialData);
 
-            // If it's a quiz, load the questions
-            if (initialData.type === "QUIZ" && initialData.content.questions) {
-                const questions = initialData.content.questions as Array<{
-                    question: string;
-                    options: string[];
-                    correctAnswer: string;
-                }>;
+        if (isOpen) {
+            if (initialData) {
+                console.log("Setting lesson data with initialData");
+                setLessonData(initialData);
+                setLessonType(initialData.type);
 
-                setQuizQuestions(
-                    questions.map((q) => ({
-                        question: q.question,
-                        options: q.options,
-                        correctAnswer: q.options.findIndex((opt) => opt === q.correctAnswer),
-                    }))
-                );
+                // If it's a quiz, load the questions
+                if (initialData.type === "QUIZ") {
+                    console.log("Loading quiz questions:", initialData.content.questions);
+                    console.log("Questions type:", typeof initialData.content.questions);
+                    console.log(
+                        "Questions array check:",
+                        Array.isArray(initialData.content.questions)
+                    );
+
+                    // Check if questions exist and are in the right format
+                    if (
+                        initialData.content.questions &&
+                        Array.isArray(initialData.content.questions)
+                    ) {
+                        const questions = initialData.content.questions as Array<{
+                            question: string;
+                            options: string[];
+                            correctAnswer: string;
+                        }>;
+
+                        console.log("Processed questions:", questions);
+
+                        setQuizQuestions(
+                            questions.map((q) => ({
+                                question: q.question,
+                                options: q.options,
+                                correctAnswer: q.options.findIndex(
+                                    (opt) => opt === q.correctAnswer
+                                ),
+                            }))
+                        );
+                    } else {
+                        console.log("No valid quiz questions found, creating empty quiz");
+                        setQuizQuestions([]);
+                    }
+                } else {
+                    console.log("No quiz questions found or not a quiz");
+                    console.log("Lesson type:", initialData.type);
+                    console.log("Content structure:", initialData.content);
+                    setQuizQuestions([]);
+                }
+            } else {
+                console.log("No initialData, resetting form");
+                setLessonData({
+                    title: "",
+                    type: "VIDEO",
+                    description: "",
+                    content: {},
+                });
+                setLessonType("VIDEO");
+                setQuizQuestions([]);
             }
-        } else {
-            setLessonData({
-                title: "",
-                type: "VIDEO",
-                description: "",
-                content: {},
-            });
-            setLessonType("VIDEO");
-            setQuizQuestions([]);
+            setCurrentStep(1);
         }
-        setCurrentStep(1);
-    }, [initialData]);
+    }, [initialData, isOpen]);
 
     const handleNext = () => {
         if (currentStep === 1) {

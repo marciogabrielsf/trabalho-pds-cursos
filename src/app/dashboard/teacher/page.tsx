@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
 import { TeacherSidebar } from "@/components/dashboard/layout";
 import { TeacherCoursesList, CreateCourseModal } from "@/components/dashboard/courses";
@@ -12,6 +13,7 @@ import { GraduationCap } from "lucide-react";
 
 export default function TeacherDashboard() {
     const { user } = useAuthStore();
+    const router = useRouter();
     const [searchTerm, setSearchTerm] = useState("");
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -35,6 +37,10 @@ export default function TeacherDashboard() {
             alert("Erro ao criar curso. Tente novamente.");
             console.error("Error creating course:", error);
         }
+    };
+
+    const handleEditCourse = (course: Course) => {
+        router.push(`/dashboard/teacher/course/${course.id}/edit`);
     };
 
     const handleDeleteCourse = async (course: Course) => {
@@ -94,6 +100,7 @@ export default function TeacherDashboard() {
                         <TeacherCoursesList
                             courses={courses}
                             isLoading={isLoading}
+                            onEditCourse={handleEditCourse}
                             onDeleteCourse={handleDeleteCourse}
                         />
                     </div>

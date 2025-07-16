@@ -18,7 +18,7 @@ interface TeacherCourseCardProps {
 const TeacherCourseCard: React.FC<TeacherCourseCardProps> = ({ course, onEdit, onDelete }) => {
     return (
         <a
-            href={`teacher/course/${course.id}`}
+            href={`teacher/course/${course.id}/lesson/${course.firstLessonId || 0}`}
             className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group"
         >
             {/* Imagem do curso */}

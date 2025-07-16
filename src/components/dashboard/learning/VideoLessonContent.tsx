@@ -60,12 +60,6 @@ const VideoLessonContent: React.FC<VideoLessonContentProps> = ({ lesson, onLesso
                     <div className="flex items-center space-x-4">
                         <span className="text-sm text-gray-500">Tipo: Vídeo Aula</span>
                     </div>
-                    <button
-                        onClick={handleVideoEnd}
-                        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-                    >
-                        Marcar como concluído
-                    </button>
                 </div>
             </div>
         </motion.div>

@@ -15,6 +15,7 @@ export interface Course {
     difficulty?: string;
     studentsCount: number;
     lessonsCount: number;
+    firstLessonId?: number;
 }
 
 export interface CourseLearningData {

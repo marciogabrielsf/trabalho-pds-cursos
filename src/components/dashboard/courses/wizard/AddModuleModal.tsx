@@ -47,18 +47,20 @@ export default function AddModuleModal({
     const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
     const [editingLesson, setEditingLesson] = useState<string | null>(null);
 
-    // Update moduleData when initialData changes
+    // Update moduleData when initialData changes or when modal opens
     useEffect(() => {
-        if (initialData) {
-            setModuleData(initialData);
-        } else {
-            setModuleData({
-                title: "",
-                description: "",
-                lessons: [],
-            });
+        if (isOpen) {
+            if (initialData) {
+                setModuleData(initialData);
+            } else {
+                setModuleData({
+                    title: "",
+                    description: "",
+                    lessons: [],
+                });
+            }
         }
-    }, [initialData]);
+    }, [initialData, isOpen]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

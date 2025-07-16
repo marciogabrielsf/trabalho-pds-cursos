@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAuthStore } from "@/stores/authStore";
 import { useTeacherModules } from "@/hooks/useModuleQuery";
-import { CourseWizardData } from "@/app/dashboard/teacher/create-course/page";
+import { CourseWizardData } from "@/types/courseWizard";
 import { Skeleton } from "@/components/ui";
 import { Pen, Trash2 } from "lucide-react";
 
@@ -14,6 +14,17 @@ export default function ExistingModules({ data, onChange }: ExistingModulesProps
     const { user } = useAuthStore();
     const { data: modules = [], isLoading } = useTeacherModules(user?.id || 0);
     const [selectedModuleId, setSelectedModuleId] = useState<string>("");
+
+    // Obter IDs dos módulos que já estão no curso
+    const courseModuleIds = data.newModules
+        .filter((module) => module.id.startsWith("course-module-"))
+        .map((module) => parseInt(module.id.replace("course-module-", "")));
+
+    // Combinar com módulos selecionados externos
+    const usedModuleIds = [...data.selectedModules, ...courseModuleIds];
+
+    // Filtrar módulos disponíveis (excluir os que já estão no curso)
+    const availableModules = modules.filter((module) => !usedModuleIds.includes(module.id));
 
     const handleModuleToggle = (moduleId: number) => {
         const selectedModules = data.selectedModules.includes(moduleId)
@@ -60,6 +71,8 @@ export default function ExistingModules({ data, onChange }: ExistingModulesProps
         setSelectedModuleId("");
     };
 
+    console.log("data selected modules", data.selectedModules);
+
     if (isLoading) {
         return (
             <div className="p-6">
@@ -84,13 +97,11 @@ export default function ExistingModules({ data, onChange }: ExistingModulesProps
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 >
                     <option value="">Select...</option>
-                    {modules
-                        .filter((module) => !data.selectedModules.includes(module.id))
-                        .map((module) => (
-                            <option key={module.id} value={module.id}>
-                                {module.title}
-                            </option>
-                        ))}
+                    {availableModules.map((module) => (
+                        <option key={module.id} value={module.id}>
+                            {module.title}
+                        </option>
+                    ))}
                 </select>
             </div>
 
@@ -147,15 +158,15 @@ export default function ExistingModules({ data, onChange }: ExistingModulesProps
                 })}
             </div>
 
-            {modules.length === 0 && (
+            {availableModules.length === 0 && (
                 <div className="text-center py-12">
                     <div className="text-gray-400 mb-4">📚</div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                        Nenhum módulo encontrado
+                        Nenhum módulo disponível
                     </h3>
                     <p className="text-gray-600">
-                        Você não possui módulos criados ainda. Crie alguns módulos primeiro ou pule
-                        para a próxima etapa.
+                        Todos os seus módulos já estão incluídos neste curso, ou você não possui
+                        módulos criados ainda.
                     </p>
                 </div>
             )}

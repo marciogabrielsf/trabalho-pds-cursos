@@ -1,4 +1,5 @@
 import { Course, CourseLearningData } from "@/types/course";
+import { Module } from "@/types/module";
 import { api } from "./api";
 
 interface CourseQueryParams {
@@ -53,6 +54,11 @@ class CourseService {
         queryParams.append("offset", offset.toString());
 
         const response = await api.get(`/student/${studentId}/courses?${queryParams.toString()}`);
+        return response.data;
+    }
+
+    async getCourseModules(courseId: number): Promise<Module[]> {
+        const response = await api.get(`/course/${courseId}/modules`);
         return response.data;
     }
 }
