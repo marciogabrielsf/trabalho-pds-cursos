@@ -4,14 +4,13 @@ import { useRouter } from "next/navigation";
 import { APP_NAME } from "@/config/config";
 import { useAuthStore } from "@/stores/authStore";
 
-interface SidebarProps {
+interface TeacherSidebarProps {
     activeItem?: string;
     onItemClick?: (item: string) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeItem = "courses", onItemClick }) => {
+const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ activeItem = "courses", onItemClick }) => {
     const router = useRouter();
-
     const { logout } = useAuthStore();
 
     const handleLogout = () => {
@@ -25,14 +24,14 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = "courses", onItemClick }
             label: "Painel de Cursos",
             icon: BookOpen,
             isActive: activeItem === "courses",
-            path: "/dashboard/student",
+            path: "/dashboard/teacher",
         },
         {
             id: "my-courses",
             label: "Meus Cursos",
             icon: User,
             isActive: activeItem === "my-courses",
-            path: "/dashboard/student/my-courses",
+            path: "/dashboard/teacher/my-courses",
         },
     ];
 
@@ -51,6 +50,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = "courses", onItemClick }
                     </div>
                     <span className="text-xl font-bold text-secondary">{APP_NAME}</span>
                 </div>
+
                 <div className="flex flex-col justify-between h-full">
                     <div className="mb-6">
                         <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
@@ -65,9 +65,13 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = "courses", onItemClick }
                                         key={item.id}
                                         onClick={() => handleItemClick(item)}
                                         className={`
-                    w-full flex items-center space-x-3 px-3 py-2 text-left rounded-lg transition-colors
-                    ${item.isActive ? " text-secondary " : "text-gray-600 hover:bg-gray-50 "}
-                  `}
+                                            w-full flex items-center space-x-3 px-3 py-2 text-left rounded-lg transition-colors
+                                            ${
+                                                item.isActive
+                                                    ? " text-secondary "
+                                                    : "text-gray-600 hover:bg-gray-50 "
+                                            }
+                                        `}
                                     >
                                         <Icon
                                             size={20}
@@ -81,6 +85,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = "courses", onItemClick }
                             })}
                         </nav>
                     </div>
+
                     <div>
                         {/* Configuração */}
                         <div className="pt-4 border-gray-200">
@@ -102,10 +107,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = "courses", onItemClick }
                         </div>
                     </div>
                 </div>
-                {/* Seção Visão Geral */}
             </div>
         </aside>
     );
 };
 
-export default Sidebar;
+export default TeacherSidebar;

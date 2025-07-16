@@ -2,6 +2,7 @@
 export { default as CourseCard } from "./CourseCard";
 export { default as CoursesList } from "./CoursesList";
 export { default as CourseSearch } from "./CourseSearch";
+export { default as SimpleSearch } from "./SimpleSearch";
 export { default as Categories } from "./Categories";
 export { default as CourseSkeleton } from "./CourseSkeleton";
 
@@ -9,6 +10,11 @@ export { default as CourseSkeleton } from "./CourseSkeleton";
 export { default as MyCourseCard } from "./MyCourseCard";
 export { default as MyCoursesList } from "./MyCoursesList";
 export { default as MyCoursesPage } from "./MyCoursesPage";
+
+// Teacher components
+export { default as TeacherCourseCard } from "./TeacherCourseCard";
+export { default as TeacherCoursesList } from "./TeacherCoursesList";
+export { default as CreateCourseModal } from "./CreateCourseModal";
 
 // Course details
 export { default as CourseHeader } from "./CourseHeader";

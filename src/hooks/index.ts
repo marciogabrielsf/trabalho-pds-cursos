@@ -1,4 +1,6 @@
 export * from "./useCourseQuery";
+export * from "./useTeacherQuery";
+export * from "./useModuleQuery";
 export * from "./useLessonQuery";
 
 // Hook simplificado para autenticação local (baseado no Zustand)

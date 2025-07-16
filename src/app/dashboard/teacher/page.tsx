@@ -1,77 +1,139 @@
 "use client";
 
+import React, { useState } from "react";
 import { useAuthStore } from "@/stores/authStore";
-import { DashboardHeader } from "@/components/dashboard/layout";
+import { TeacherSidebar } from "@/components/dashboard/layout";
+import { TeacherCoursesList, CreateCourseModal } from "@/components/dashboard/courses";
+import SimpleSearch from "@/components/dashboard/courses/SimpleSearch";
+import { useTeacherCourses, useCreateCourse, useDeleteCourse } from "@/hooks/useTeacherQuery";
+import { CourseFormData } from "@/components/dashboard/courses/CreateCourseModal";
+import { Course } from "@/types/course";
+import { GraduationCap } from "lucide-react";
 
 export default function TeacherDashboard() {
     const { user } = useAuthStore();
+    const [searchTerm, setSearchTerm] = useState("");
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+    // Queries
+    const { data: courses = [], isLoading } = useTeacherCourses(user?.id || 0, {
+        search: searchTerm,
+    });
+
+    const createCourseMutation = useCreateCourse();
+    const deleteCourseMutation = useDeleteCourse();
+
+    const handleCreateCourse = async (courseData: CourseFormData) => {
+        try {
+            await createCourseMutation.mutateAsync({
+                ...courseData,
+                teacher_id: user?.id || 1,
+            });
+            setIsCreateModalOpen(false);
+            alert("Curso criado com sucesso!");
+        } catch (error) {
+            alert("Erro ao criar curso. Tente novamente.");
+            console.error("Error creating course:", error);
+        }
+    };
+
+    const handleDeleteCourse = async (course: Course) => {
+        if (window.confirm(`Tem certeza que deseja excluir o curso "${course.title}"?`)) {
+            try {
+                await deleteCourseMutation.mutateAsync(course.id);
+                alert("Curso excluído com sucesso!");
+            } catch (error) {
+                alert("Erro ao excluir curso. Tente novamente.");
+                console.error("Error deleting course:", error);
+            }
+        }
+    };
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <DashboardHeader />
-            <main className="container mx-auto px-6 py-8">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                        Dashboard do Professor
-                    </h1>
-                    <p className="text-gray-600">
-                        Bem-vindo, {user?.name}! Gerencie seus cursos e alunos aqui.
-                    </p>
-                </div>
+        <div className="flex min-h-screen bg-gray-50">
+            <TeacherSidebar activeItem="courses" />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div className="bg-white p-6 rounded-lg shadow-sm">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Meus Cursos</h3>
-                        <p className="text-gray-600 text-sm">Gerencie e crie novos cursos</p>
-                        <div className="mt-4">
-                            <span className="text-2xl font-bold text-purple-600">0</span>
-                            <span className="text-gray-500 ml-2">cursos ativos</span>
+            <div className="flex-1 flex flex-col">
+                {/* Header */}
+                <header className="bg-white border-b border-gray-200 px-6 py-4">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-900">
+                                Bem-Vindo, Prof. {user?.name}
+                            </h1>
+                            <p className="text-gray-600 text-sm">Terça, 15 de Julho de 2025</p>
                         </div>
                     </div>
+                </header>
 
-                    <div className="bg-white p-6 rounded-lg shadow-sm">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Alunos</h3>
-                        <p className="text-gray-600 text-sm">Veja o progresso dos seus alunos</p>
-                        <div className="mt-4">
-                            <span className="text-2xl font-bold text-blue-600">0</span>
-                            <span className="text-gray-500 ml-2">alunos matriculados</span>
+                {/* Main Content */}
+                <main className="flex-1 p-6">
+                    {/* Courses Section */}
+                    <div className="bg-white rounded-lg shadow-sm p-6">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-semibold text-gray-900">Seus Cursos</h2>
+                        </div>
+
+                        {/* Search */}
+                        <div className="mb-6 flex justify-between">
+                            <SimpleSearch
+                                value={searchTerm}
+                                onChange={setSearchTerm}
+                                placeholder="Pesquise seu curso aqui..."
+                            />
+                            <a
+                                href="/dashboard/teacher/create-course"
+                                className="bg-secondary font-bold text-white px-6 py-2 rounded-lg hover:bg-purple-500 transition-colors flex items-center space-x-2"
+                            >
+                                <GraduationCap size={20} />
+                                <span>CRIAR NOVO CURSO</span>
+                            </a>
+                        </div>
+
+                        {/* Courses List */}
+                        <TeacherCoursesList
+                            courses={courses}
+                            isLoading={isLoading}
+                            onDeleteCourse={handleDeleteCourse}
+                        />
+                    </div>
+
+                    {/* Pagination */}
+                    <div className="flex justify-center mt-8">
+                        <div className="flex items-center space-x-2">
+                            <button className="px-3 py-1 text-sm text-gray-500 hover:text-gray-700">
+                                ←
+                            </button>
+                            <button className="px-3 py-1 text-sm bg-orange-500 text-white rounded">
+                                01
+                            </button>
+                            <button className="px-3 py-1 text-sm text-gray-500 hover:text-gray-700">
+                                02
+                            </button>
+                            <button className="px-3 py-1 text-sm text-gray-500 hover:text-gray-700">
+                                03
+                            </button>
+                            <button className="px-3 py-1 text-sm text-gray-500 hover:text-gray-700">
+                                04
+                            </button>
+                            <button className="px-3 py-1 text-sm text-gray-500 hover:text-gray-700">
+                                05
+                            </button>
+                            <button className="px-3 py-1 text-sm text-gray-500 hover:text-gray-700">
+                                →
+                            </button>
                         </div>
                     </div>
+                </main>
+            </div>
 
-                    <div className="bg-white p-6 rounded-lg shadow-sm">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Receita</h3>
-                        <p className="text-gray-600 text-sm">Acompanhe seus ganhos</p>
-                        <div className="mt-4">
-                            <span className="text-2xl font-bold text-green-600">R$ 0,00</span>
-                            <span className="text-gray-500 ml-2">este mês</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Ações Rápidas</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <button className="p-4 border border-purple-200 rounded-lg hover:bg-purple-50 transition-colors">
-                            <div className="text-purple-600 font-medium">Criar Novo Curso</div>
-                            <div className="text-sm text-gray-500 mt-1">
-                                Comece um novo curso do zero
-                            </div>
-                        </button>
-                        <button className="p-4 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
-                            <div className="text-blue-600 font-medium">Gerenciar Módulos</div>
-                            <div className="text-sm text-gray-500 mt-1">
-                                Organize o conteúdo dos seus cursos
-                            </div>
-                        </button>
-                        <button className="p-4 border border-green-200 rounded-lg hover:bg-green-50 transition-colors">
-                            <div className="text-green-600 font-medium">Ver Relatórios</div>
-                            <div className="text-sm text-gray-500 mt-1">
-                                Analise o desempenho dos alunos
-                            </div>
-                        </button>
-                    </div>
-                </div>
-            </main>
+            {/* Create Course Modal */}
+            <CreateCourseModal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                onSubmit={handleCreateCourse}
+                isLoading={createCourseMutation.isPending}
+            />
         </div>
     );
 }

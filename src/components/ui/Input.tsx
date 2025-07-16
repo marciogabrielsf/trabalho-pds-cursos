@@ -18,7 +18,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     `;
 
         return (
-            <div className="flex flex-col">
+            <div className="flex flex-col w-full">
                 {label && <label className="mb-2 text-sm font-medium text-gray-700">{label}</label>}
                 <input ref={ref} className={`${baseClasses} ${className}`} {...props} />
                 {error && <span className="mt-1 text-sm text-red-500">{error}</span>}
