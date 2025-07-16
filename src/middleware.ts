@@ -4,30 +4,39 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
     const userEmail = request.cookies.get("user-email")?.value;
     const userData = request.cookies.get("user-data")?.value;
+    const userRole = request.cookies.get("user-role")?.value;
 
-    const isAuthenticated = userEmail && userData;
-    const isAuthPage = request.nextUrl.pathname === "/";
+    const isAuthenticated = userEmail && userData && userRole;
+    const isStudentLoginPage = request.nextUrl.pathname === "/";
+    const isTeacherLoginPage = request.nextUrl.pathname === "/teacher/login";
     const isDashboardPage = request.nextUrl.pathname.startsWith("/dashboard");
 
-    // Se está autenticado e tentando acessar a página de login, redirecionar para dashboard
-    if (isAuthenticated && isAuthPage) {
-        try {
-            const user = JSON.parse(userData);
-            const dashboardPath =
-                user.role === "teacher" ? "/dashboard/teacher" : "/dashboard/student";
-            return NextResponse.redirect(new URL(dashboardPath, request.url));
-        } catch {
-            // Se não conseguir fazer parse dos dados, limpar cookies e continuar
-            const response = NextResponse.next();
-            response.cookies.delete("user-email");
-            response.cookies.delete("user-data");
-            return response;
-        }
+    // Se está autenticado e tentando acessar página de login, redirecionar para dashboard correto
+    if (isAuthenticated && (isStudentLoginPage || isTeacherLoginPage)) {
+        const dashboardPath = userRole === "teacher" ? "/dashboard/teacher" : "/dashboard/student";
+        return NextResponse.redirect(new URL(dashboardPath, request.url));
     }
 
-    // Se não está autenticado e tentando acessar dashboard, redirecionar para login
+    // Se não está autenticado e tentando acessar dashboard, redirecionar para login correto
     if (!isAuthenticated && isDashboardPage) {
-        return NextResponse.redirect(new URL("/", request.url));
+        const loginPath = request.nextUrl.pathname.startsWith("/dashboard/teacher")
+            ? "/teacher/login"
+            : "/";
+        return NextResponse.redirect(new URL(loginPath, request.url));
+    }
+
+    // Se está autenticado mas tentando acessar dashboard errado, redirecionar para dashboard correto
+    if (isAuthenticated && isDashboardPage) {
+        const isTeacherRoute = request.nextUrl.pathname.startsWith("/dashboard/teacher");
+        const isStudentRoute = request.nextUrl.pathname.startsWith("/dashboard/student");
+
+        if (userRole === "teacher" && isStudentRoute) {
+            return NextResponse.redirect(new URL("/dashboard/teacher", request.url));
+        }
+
+        if (userRole === "student" && isTeacherRoute) {
+            return NextResponse.redirect(new URL("/dashboard/student", request.url));
+        }
     }
 
     return NextResponse.next();

@@ -7,10 +7,10 @@ import LoginIllustration from "./LoginIllustration";
 import { LoginFormData } from "@/types/auth";
 import { useAuthStore } from "@/stores/authStore";
 
-const LoginPage: React.FC = () => {
+const TeacherLoginPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [loginError, setLoginError] = useState<string | null>(null);
-    const { login } = useAuthStore();
+    const { teacherLogin } = useAuthStore();
     const router = useRouter();
 
     const handleLogin = async (data: LoginFormData) => {
@@ -18,17 +18,16 @@ const LoginPage: React.FC = () => {
         setLoginError(null);
 
         try {
-            const success = await login(data.email, data.senha);
+            const success = await teacherLogin(data.email, data.senha);
 
             if (success) {
-                // O middleware irá redirecionar automaticamente
-                // mas podemos forçar o redirecionamento aqui também
+                // O middleware irá redirecionar automaticamente para /dashboard/teacher
                 router.refresh();
             } else {
                 setLoginError("Email ou senha inválidos. Verifique suas credenciais.");
             }
         } catch (error) {
-            console.error("Erro no login:", error);
+            console.error("Erro no login do professor:", error);
             setLoginError("Erro interno. Tente novamente mais tarde.");
         } finally {
             setIsLoading(false);
@@ -49,10 +48,10 @@ const LoginPage: React.FC = () => {
                         <div className="w-full max-w-md">
                             <div className="text-center mb-8">
                                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                    Entre na sua conta
+                                    Portal do Professor
                                 </h1>
                                 <p className="text-gray-600">
-                                    Bem-vindo de volta! Por favor, insira seus dados.
+                                    Bem-vindo de volta! Acesse sua conta de professor.
                                 </p>
                             </div>
 
@@ -64,12 +63,12 @@ const LoginPage: React.FC = () => {
 
                             <LoginForm onSubmit={handleLogin} isLoading={isLoading} />
 
-                            {/* Link para login do professor */}
+                            {/* Link para login do estudante */}
                             <div className="mt-6 text-center">
                                 <p className="text-gray-600 text-sm">
-                                    É professor?{" "}
+                                    É estudante?{" "}
                                     <Link
-                                        href="/teacher/login"
+                                        href="/"
                                         className="text-blue-600 hover:text-blue-800 font-medium"
                                     >
                                         Faça login aqui
@@ -84,4 +83,4 @@ const LoginPage: React.FC = () => {
     );
 };
 
-export default LoginPage;
+export default TeacherLoginPage;

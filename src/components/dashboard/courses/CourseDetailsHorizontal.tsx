@@ -29,7 +29,7 @@ export default function CourseDetailsHorizontal({
     };
 
     const getDifficultyLabel = (difficulty: string) => {
-        switch (difficulty) {
+        switch (difficulty.toLowerCase()) {
             case "begineer":
                 return "Fácil";
             case "intermediate":

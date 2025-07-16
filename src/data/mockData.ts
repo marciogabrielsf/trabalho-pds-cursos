@@ -37,6 +37,3 @@ export const mockCategories = [
         coursesCount: 29,
     },
 ];
-
-// Tipos removidos - agora usando os tipos da API em types/course.ts
-// Mock courses removidos - agora usando React Query com dados da API

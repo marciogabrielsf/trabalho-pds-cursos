@@ -1,10 +1,15 @@
-import { Student } from "@/types/user";
+import { Student, Teacher } from "@/types/user";
 import { api } from "./api";
 import { LoginRequest } from "@/types/auth";
 
 class AuthService {
     async studentLogin(data: LoginRequest): Promise<Student | null> {
         const response = await api.post("/student/login", data);
+        return response.data;
+    }
+
+    async teacherLogin(data: LoginRequest): Promise<Teacher | null> {
+        const response = await api.post("/teacher/login", data);
         return response.data;
     }
 

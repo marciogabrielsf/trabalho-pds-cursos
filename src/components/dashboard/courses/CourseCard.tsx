@@ -36,7 +36,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
                 <div
                     className={`absolute capitalize  top-3 left-3 px-3 py-2 rounded-md text-xs font-semibold text-white bg-gray-800`}
                 >
-                    {course.category}
+                    {course.category.toLowerCase()}
                 </div>
 
                 {/* Progresso (se inscrito) */}

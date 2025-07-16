@@ -52,7 +52,7 @@ const MyCourseCard: React.FC<MyCourseCardProps> = ({ course }) => {
                                 <div className="flex items-center space-x-2">
                                     <Users className="w-4 h-4 text-highlight" />
                                     <span className="capitalize text-sm text-gray-600">
-                                        {course.category}
+                                        {course.category.toLowerCase()}
                                     </span>
                                 </div>
 

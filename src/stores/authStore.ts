@@ -2,14 +2,16 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { setCookie, getCookie, deleteCookie } from "cookies-next";
 import { authService } from "@/services/authService";
-import { Student } from "@/types/user";
+import { Student, Teacher } from "@/types/user";
 
 interface AuthState {
-    user: Student | null;
+    user: Student | Teacher | null;
     isAuthenticated: boolean;
+    userRole: "student" | "teacher" | null;
     login: (email: string, password: string) => Promise<boolean>;
+    teacherLogin: (email: string, password: string) => Promise<boolean>;
     logout: () => void;
-    updateUser: (userData: Partial<Student>) => void;
+    updateUser: (userData: Partial<Student | Teacher>) => void;
     checkAuth: () => void;
 }
 
@@ -18,6 +20,7 @@ export const useAuthStore = create<AuthState>()(
         (set, get) => ({
             user: null,
             isAuthenticated: false,
+            userRole: null,
 
             login: async (email: string, password: string): Promise<boolean> => {
                 try {
@@ -35,7 +38,7 @@ export const useAuthStore = create<AuthState>()(
                             sameSite: "lax",
                         });
 
-                        // // Salvar dados do usuário no cookie
+                        // Salvar dados do usuário no cookie
                         setCookie("user-data", JSON.stringify(user), {
                             maxAge: 30 * 24 * 60 * 60, // 30 dias
                             httpOnly: false,
@@ -43,7 +46,15 @@ export const useAuthStore = create<AuthState>()(
                             sameSite: "lax",
                         });
 
-                        set({ user, isAuthenticated: true });
+                        // Salvar role no cookie
+                        setCookie("user-role", "student", {
+                            maxAge: 30 * 24 * 60 * 60, // 30 dias
+                            httpOnly: false,
+                            secure: process.env.NODE_ENV === "production",
+                            sameSite: "lax",
+                        });
+
+                        set({ user, isAuthenticated: true, userRole: "student" });
                         return true;
                     }
                     return false;
@@ -53,14 +64,57 @@ export const useAuthStore = create<AuthState>()(
                 }
             },
 
+            teacherLogin: async (email: string, password: string): Promise<boolean> => {
+                try {
+                    if (email && password && password.length >= 6) {
+                        const user = await authService.teacherLogin({
+                            email,
+                            password,
+                        });
+
+                        // Salvar email no cookie
+                        setCookie("user-email", email, {
+                            maxAge: 30 * 24 * 60 * 60, // 30 dias
+                            httpOnly: false,
+                            secure: process.env.NODE_ENV === "production",
+                            sameSite: "lax",
+                        });
+
+                        // Salvar dados do usuário no cookie
+                        setCookie("user-data", JSON.stringify(user), {
+                            maxAge: 30 * 24 * 60 * 60, // 30 dias
+                            httpOnly: false,
+                            secure: process.env.NODE_ENV === "production",
+                            sameSite: "lax",
+                        });
+
+                        // Salvar role no cookie
+                        setCookie("user-role", "teacher", {
+                            maxAge: 30 * 24 * 60 * 60, // 30 dias
+                            httpOnly: false,
+                            secure: process.env.NODE_ENV === "production",
+                            sameSite: "lax",
+                        });
+
+                        set({ user, isAuthenticated: true, userRole: "teacher" });
+                        return true;
+                    }
+                    return false;
+                } catch (error) {
+                    console.error("Erro no login do professor:", error);
+                    return false;
+                }
+            },
+
             logout: () => {
                 // Remover cookies
                 deleteCookie("user-email");
                 deleteCookie("user-data");
-                set({ user: null, isAuthenticated: false });
+                deleteCookie("user-role");
+                set({ user: null, isAuthenticated: false, userRole: null });
             },
 
-            updateUser: (userData: Partial<Student>) => {
+            updateUser: (userData: Partial<Student | Teacher>) => {
                 const currentUser = get().user;
                 if (currentUser) {
                     const updatedUser = { ...currentUser, ...userData };
@@ -79,16 +133,21 @@ export const useAuthStore = create<AuthState>()(
                 try {
                     const userEmail = getCookie("user-email");
                     const userData = getCookie("user-data");
+                    const userRole = getCookie("user-role");
 
-                    if (userEmail && userData) {
-                        const user = JSON.parse(userData as string) as Student;
-                        set({ user, isAuthenticated: true });
+                    if (userEmail && userData && userRole) {
+                        const user = JSON.parse(userData as string) as Student | Teacher;
+                        set({
+                            user,
+                            isAuthenticated: true,
+                            userRole: userRole as "student" | "teacher",
+                        });
                     } else {
-                        set({ user: null, isAuthenticated: false });
+                        set({ user: null, isAuthenticated: false, userRole: null });
                     }
                 } catch (error) {
                     console.error("Erro ao verificar autenticação:", error);
-                    set({ user: null, isAuthenticated: false });
+                    set({ user: null, isAuthenticated: false, userRole: null });
                 }
             },
         }),
