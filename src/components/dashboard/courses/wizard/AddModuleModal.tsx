@@ -79,7 +79,7 @@ export default function AddModuleModal({
         content: Record<string, unknown>;
     }) => {
         const newLesson = {
-            id: Date.now().toString(),
+            id: `new-lesson-${Date.now()}`,
             ...lessonData,
             order: moduleData.lessons.length + 1,
         };

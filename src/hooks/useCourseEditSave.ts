@@ -93,18 +93,34 @@ export function useCourseEditSave(courseId: number, userId: number) {
 
                 // Atualizar as aulas do módulo
                 for (const lessonData of courseModuleData.lessons) {
-                    const originalLessonId = parseInt(lessonData.id.replace("lesson-", ""));
-                    await updateLessonAsync({
-                        lessonId: originalLessonId,
-                        lessonData: {
+                    // Verificar se é uma lição existente (começa com "lesson-") ou nova (começa com "new-lesson-")
+                    if (lessonData.id.startsWith("lesson-")) {
+                        // Lição existente - atualizar
+                        console.log(`Atualizando lição existente: ${lessonData.id}`);
+                        const originalLessonId = parseInt(lessonData.id.replace("lesson-", ""));
+                        await updateLessonAsync({
+                            lessonId: originalLessonId,
+                            lessonData: {
+                                title: lessonData.title,
+                                type: lessonData.type,
+                                description: lessonData.description,
+                                content: lessonData.content,
+                                order: lessonData.order,
+                                id_module: courseModuleData.id,
+                            },
+                        });
+                    } else {
+                        // Lição nova - criar
+                        console.log(`Criando nova lição: ${lessonData.id}`);
+                        await createLessonAsync({
                             title: lessonData.title,
                             type: lessonData.type,
                             description: lessonData.description,
                             content: lessonData.content,
                             order: lessonData.order,
                             id_module: courseModuleData.id,
-                        },
-                    });
+                        });
+                    }
                 }
             }
 

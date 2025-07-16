@@ -3,6 +3,7 @@ import { CourseWizardData } from "@/types/courseWizard";
 import { Plus, Edit, Trash2, Menu } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { useTeacherModules } from "@/hooks/useModuleQuery";
+import Button from "@/components/ui/Button";
 import {
     DndContext,
     closestCenter,
@@ -119,6 +120,7 @@ function SortableModule({
     onUpdateLessons,
     onEditLesson,
     onDeleteLesson,
+    onAddLesson,
     isExisting = false,
 }: {
     module: ModuleData;
@@ -128,6 +130,7 @@ function SortableModule({
     onUpdateLessons: (moduleId: string, lessons: LessonData[]) => void;
     onEditLesson: (moduleId: string, lessonId: string) => void;
     onDeleteLesson: (moduleId: string, lessonId: string) => void;
+    onAddLesson: (moduleId: string) => void;
     isExisting?: boolean;
 }) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -160,7 +163,19 @@ function SortableModule({
             );
 
             const newLessons = arrayMove(module.lessons, oldIndex, newIndex);
-            onUpdateLessons(module.id, newLessons);
+
+            // Atualizar a propriedade order de cada lição
+            const lessonsWithUpdatedOrder = newLessons.map((lesson, index) => ({
+                ...lesson,
+                order: index + 1,
+            }));
+
+            console.log(
+                "Reordenando lições:",
+                lessonsWithUpdatedOrder.map((l) => ({ id: l.id, title: l.title, order: l.order }))
+            );
+
+            onUpdateLessons(module.id, lessonsWithUpdatedOrder);
         }
     }
 
@@ -228,6 +243,19 @@ function SortableModule({
                         ))}
                     </SortableContext>
                 </DndContext>
+
+                {/* Botão para adicionar nova lição */}
+                <div className="mt-4 pt-3 border-t border-gray-200">
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={() => onAddLesson(module.id)}
+                        className="w-full"
+                    >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Adicionar Lição
+                    </Button>
+                </div>
             </div>
         </div>
     );
@@ -243,6 +271,7 @@ export default function NewModules({ data, onChange }: NewModulesProps) {
         moduleId: string;
         lessonId: string;
     } | null>(null);
+    const [addingLessonToModule, setAddingLessonToModule] = useState<string | null>(null); // Para controlar a qual módulo estamos adicionando lição
 
     // Combinar módulos existentes selecionados com novos módulos baseado na ordem
     const allModules: UnifiedModuleData[] = useMemo(() => {
@@ -381,15 +410,29 @@ export default function NewModules({ data, onChange }: NewModulesProps) {
 
     const handleEditLesson = (moduleId: string, lessonId: string) => {
         setEditingLesson({ moduleId, lessonId });
+        setAddingLessonToModule(null); // Limpar estado de adição
+        setIsLessonModalOpen(true);
+    };
+
+    const handleAddLesson = (moduleId: string) => {
+        setAddingLessonToModule(moduleId);
+        setEditingLesson(null); // Limpar estado de edição
         setIsLessonModalOpen(true);
     };
 
     const handleDeleteLesson = (moduleId: string, lessonId: string) => {
         const updatedModules = data.newModules.map((mod) => {
             if (mod.id === moduleId) {
+                const filteredLessons = mod.lessons.filter((lesson) => lesson.id !== lessonId);
+                // Recalcular a ordem de todas as lições
+                const lessonsWithUpdatedOrder = filteredLessons.map((lesson, index) => ({
+                    ...lesson,
+                    order: index + 1,
+                }));
+
                 return {
                     ...mod,
-                    lessons: mod.lessons.filter((lesson) => lesson.id !== lessonId),
+                    lessons: lessonsWithUpdatedOrder,
                 };
             }
             return mod;
@@ -403,23 +446,64 @@ export default function NewModules({ data, onChange }: NewModulesProps) {
         description: string;
         content: Record<string, unknown>;
     }) => {
-        if (!editingLesson) return;
+        // Se estamos editando uma lição existente
+        if (editingLesson) {
+            const updatedModules = data.newModules.map((mod) => {
+                if (mod.id === editingLesson.moduleId) {
+                    return {
+                        ...mod,
+                        lessons: mod.lessons.map((lesson) =>
+                            lesson.id === editingLesson.lessonId
+                                ? { ...lesson, ...lessonData }
+                                : lesson
+                        ),
+                    };
+                }
+                return mod;
+            });
 
-        const updatedModules = data.newModules.map((mod) => {
-            if (mod.id === editingLesson.moduleId) {
-                return {
-                    ...mod,
-                    lessons: mod.lessons.map((lesson) =>
-                        lesson.id === editingLesson.lessonId ? { ...lesson, ...lessonData } : lesson
-                    ),
-                };
-            }
-            return mod;
-        });
+            onChange({ newModules: updatedModules });
+        }
+        // Se estamos adicionando uma nova lição
+        else if (addingLessonToModule) {
+            const newLesson: LessonData = {
+                id: `new-lesson-${Date.now()}`,
+                ...lessonData,
+                order: 0, // Será ajustado na ordenação
+            };
 
-        onChange({ newModules: updatedModules });
+            const updatedModules = data.newModules.map((mod) => {
+                if (mod.id === addingLessonToModule) {
+                    const updatedLessons = [...mod.lessons, newLesson];
+                    // Recalcular a ordem de todas as lições
+                    const lessonsWithUpdatedOrder = updatedLessons.map((lesson, index) => ({
+                        ...lesson,
+                        order: index + 1,
+                    }));
+
+                    console.log(
+                        "Adicionando lição e recalculando ordem:",
+                        lessonsWithUpdatedOrder.map((l) => ({
+                            id: l.id,
+                            title: l.title,
+                            order: l.order,
+                        }))
+                    );
+
+                    return {
+                        ...mod,
+                        lessons: lessonsWithUpdatedOrder,
+                    };
+                }
+                return mod;
+            });
+
+            onChange({ newModules: updatedModules });
+        }
+
         setIsLessonModalOpen(false);
         setEditingLesson(null);
+        setAddingLessonToModule(null);
     };
 
     function handleModuleDragEnd(event: DragEndEvent) {
@@ -506,6 +590,7 @@ export default function NewModules({ data, onChange }: NewModulesProps) {
                                 onUpdateLessons={handleUpdateLessons}
                                 onEditLesson={handleEditLesson}
                                 onDeleteLesson={handleDeleteLesson}
+                                onAddLesson={handleAddLesson}
                                 isExisting={module.isExisting}
                             />
                         ))}
