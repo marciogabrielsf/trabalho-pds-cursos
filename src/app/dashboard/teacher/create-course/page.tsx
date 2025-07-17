@@ -4,6 +4,8 @@ import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
 import { TeacherSidebar } from "@/components/dashboard/layout";
+import { StatusDialog } from "@/components/ui/StatusDialog";
+import { useStatusDialog } from "@/hooks/useStatusDialog";
 import {
     ArrowLeft,
     ArrowRight,
@@ -17,18 +19,14 @@ import {
 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import CourseBasicInfo from "@/components/dashboard/courses/wizard/CourseBasicInfo";
-import { useCreateCourse } from "@/hooks/useTeacherQuery";
-import {
-    useAddModuleToCourse,
-    useTeacherModules,
-    useCreateModule,
-    useCreateLesson,
-} from "@/hooks/useModuleQuery";
+import { useCreateCompleteCourse } from "@/hooks/useTeacherQuery";
+import { useTeacherModules } from "@/hooks/useModuleQuery";
+import { useWizardSteps } from "@/hooks/useWizardSteps";
 import ExistingModules from "@/components/dashboard/courses/wizard/ExistingModules";
 import NewModules from "@/components/dashboard/courses/wizard/NewModules";
-import { CourseWizardData } from "@/types/courseWizard";
+import { CourseWizardData, WizardStep } from "@/types/courseWizard";
 
-const steps = [
+const steps: WizardStep[] = [
     { id: 1, title: "Informações básicas", description: "Informações do curso" },
     { id: 2, title: "Módulos existentes", description: "Selecione módulos existentes" },
     { id: 3, title: "Novos módulos", description: "Crie novos módulos" },
@@ -38,7 +36,6 @@ const steps = [
 export default function CreateCoursePage() {
     const router = useRouter();
     const { user } = useAuthStore();
-    const [currentStep, setCurrentStep] = useState(1);
     const [wizardData, setWizardData] = useState<CourseWizardData>({
         title: "",
         description: "",
@@ -52,11 +49,11 @@ export default function CreateCoursePage() {
         moduleOrder: [],
     });
 
-    const createCourseMutation = useCreateCourse();
-    const addModuleToCourse = useAddModuleToCourse();
-    const createModule = useCreateModule();
-    const createLesson = useCreateLesson();
+    const createCompleteCourseMutation = useCreateCompleteCourse();
     const { data: existingModules = [] } = useTeacherModules(user?.id || 0);
+    const { dialogState, closeDialog, showSuccess, showError } = useStatusDialog();
+    const { currentStep, handleNext, handleBack, canGoNext, canGoBack, isLastStep } =
+        useWizardSteps(steps, "create");
 
     // Preparar dados para API
     const prepareDataForAPI = useMemo(() => {
@@ -116,70 +113,47 @@ export default function CreateCoursePage() {
         };
     }, [wizardData, user?.id]);
 
-    const handleNext = () => {
-        if (currentStep < steps.length) {
-            setCurrentStep(currentStep + 1);
-        }
-    };
-
-    const handleBack = () => {
-        if (currentStep > 1) {
-            setCurrentStep(currentStep - 1);
-        }
-    };
-
     const handleFinish = async () => {
         try {
             const apiData = prepareDataForAPI;
 
-            // 1. Criar o curso
-            const course = await createCourseMutation.mutateAsync(apiData.courseData);
+            // Usar a nova API otimizada que cria tudo em uma única chamada
+            const course = await createCompleteCourseMutation.mutateAsync({
+                courseData: apiData.courseData,
+                existingModulesData: apiData.existingModulesData,
+                newModulesData: apiData.newModulesData,
+            });
 
-            // 2. Adicionar módulos existentes ao curso (na ordem correta)
-            for (const moduleData of apiData.existingModulesData) {
-                await addModuleToCourse.mutateAsync({
-                    course_id: course.id,
-                    module_id: moduleData.module_id,
-                    order: moduleData.order,
-                });
-            }
+            console.log("Curso criado com sucesso:", course);
 
-            // 3. Criar novos módulos e suas aulas
-            for (const newModuleData of apiData.newModulesData) {
-                // Criar o módulo
-                const createdModule = await createModule.mutateAsync({
-                    title: newModuleData.title,
-                    description: newModuleData.description,
-                    teacher_id: user?.id || 1,
-                });
-
-                // Adicionar o módulo ao curso
-                await addModuleToCourse.mutateAsync({
-                    course_id: course.id,
-                    module_id: createdModule.id,
-                    order: newModuleData.order,
-                });
-
-                // Criar as aulas do módulo
-                for (const lessonData of newModuleData.lessons) {
-                    await createLesson.mutateAsync({
-                        title: lessonData.title,
-                        type: lessonData.type,
-                        description: lessonData.description,
-                        content: lessonData.content,
-                        order: lessonData.order,
-                        id_module: createdModule.id,
-                    });
+            showSuccess(
+                "Curso Criado com Sucesso!",
+                "Seu novo curso foi criado e está pronto para receber alunos. Você será redirecionado para o painel do professor.",
+                {
+                    label: "Ir para o Painel",
+                    onClick: () => {
+                        closeDialog();
+                        router.push("/dashboard/teacher");
+                    },
                 }
-            }
-
-            console.log("Dados para API:", apiData);
-            console.log("Curso criado com sucesso!");
-            alert("Curso criado com sucesso!");
-            router.push("/dashboard/teacher");
+            );
         } catch (error) {
-            alert("Erro ao criar curso. Tente novamente.");
             console.error("Error creating course:", error);
+            showError(
+                "Erro ao Criar Curso",
+                "Ocorreu um erro ao tentar criar o curso. Por favor, verifique os dados e tente novamente.",
+                {
+                    label: "Tentar Novamente",
+                    onClick: () => {
+                        closeDialog();
+                        handleFinish();
+                    },
+                },
+                {
+                    label: "Cancelar",
+                    onClick: closeDialog,
+                }
+            );
         }
     };
 
@@ -346,18 +320,6 @@ export default function CreateCoursePage() {
                                 })}
                             </div>
                         </div>
-
-                        {/* Dados para API (Debug) */}
-                        {process.env.NODE_ENV === "development" && (
-                            <div className="mt-6 bg-gray-100 rounded-lg p-4">
-                                <h4 className="font-semibold text-gray-900 mb-2">
-                                    Dados para API (Debug)
-                                </h4>
-                                <pre className="text-xs text-gray-600 overflow-x-auto">
-                                    {JSON.stringify(prepareDataForAPI, null, 2)}
-                                </pre>
-                            </div>
-                        )}
                     </div>
                 );
             default:
@@ -448,16 +410,17 @@ export default function CreateCoursePage() {
                                 <Button
                                     variant="secondary"
                                     onClick={handleBack}
-                                    disabled={currentStep === 1}
+                                    disabled={!canGoBack}
                                     className="flex items-center space-x-2"
                                 >
                                     <ArrowLeft size={16} />
                                     <span>Voltar</span>
                                 </Button>
 
-                                {currentStep < steps.length ? (
+                                {!isLastStep ? (
                                     <Button
                                         onClick={handleNext}
+                                        disabled={!canGoNext}
                                         className="flex items-center space-x-2"
                                     >
                                         <span>Continuar</span>
@@ -466,10 +429,10 @@ export default function CreateCoursePage() {
                                 ) : (
                                     <Button
                                         onClick={handleFinish}
-                                        disabled={createCourseMutation.isPending}
+                                        disabled={createCompleteCourseMutation.isPending}
                                         className="bg-green-600 hover:bg-green-700"
                                     >
-                                        {createCourseMutation.isPending
+                                        {createCompleteCourseMutation.isPending
                                             ? "Criando..."
                                             : "Concluir Curso"}
                                     </Button>
@@ -479,6 +442,17 @@ export default function CreateCoursePage() {
                     </div>
                 </main>
             </div>
+
+            {/* Status Dialog */}
+            <StatusDialog
+                isOpen={dialogState.isOpen}
+                onClose={closeDialog}
+                type={dialogState.type}
+                title={dialogState.title}
+                description={dialogState.description}
+                primaryAction={dialogState.primaryAction}
+                secondaryAction={dialogState.secondaryAction}
+            />
         </div>
     );
 }

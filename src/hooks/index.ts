@@ -6,6 +6,7 @@ export * from "./useCourseEdit";
 export * from "./useCourseEditAPI";
 export * from "./useCourseEditSave";
 export * from "./useWizardSteps";
+export * from "./useStatusDialog";
 
 // Hook simplificado para autenticação local (baseado no Zustand)
 import { useAuthStore } from "@/stores/authStore";

@@ -1,4 +1,13 @@
 // Types shared between create and edit course pages
+import { CourseDifficulty, CourseCategory } from "./course";
+import { LessonType } from "./lesson";
+
+export interface WizardStep {
+    id: number;
+    title: string;
+    description: string;
+}
+
 export interface CourseWizardData {
     // Step 1: Basic Info
     title: string;
@@ -6,8 +15,8 @@ export interface CourseWizardData {
     value: number;
     trailer_url: string;
     thumbnail_url: string;
-    difficulty: "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
-    category: "PROGRAMMING" | "DESIGN" | "BUSINESS" | "MARKETING" | "PHOTOGRAPHY" | "MUSIC";
+    difficulty: CourseDifficulty;
+    category: CourseCategory;
 
     // Step 2: Existing Modules
     selectedModules: number[];
@@ -20,7 +29,7 @@ export interface CourseWizardData {
         lessons: {
             id: string;
             title: string;
-            type: "VIDEO" | "QUIZ" | "TEXT";
+            type: LessonType;
             description: string;
             content: Record<string, unknown>;
             order: number;

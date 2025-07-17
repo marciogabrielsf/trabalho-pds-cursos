@@ -1,7 +1,7 @@
 import { Course } from "@/types/course";
 import { api } from "./api";
 
-interface CreateCourseData {
+export interface CreateCourseData {
     title: string;
     description: string;
     value: number;
@@ -12,7 +12,63 @@ interface CreateCourseData {
     category: "PROGRAMMING" | "DESIGN" | "BUSINESS" | "MARKETING" | "PHOTOGRAPHY" | "MUSIC";
 }
 
-interface TeacherCourseQueryParams {
+export interface CreateCompleteCourseData {
+    courseData: CreateCourseData;
+    existingModulesData: Array<{
+        module_id: number;
+        order: number;
+    }>;
+    newModulesData: Array<{
+        title: string;
+        description: string;
+        order: number;
+        lessons: Array<{
+            id: string;
+            title: string;
+            type: "VIDEO" | "QUIZ" | "TEXT";
+            description: string;
+            content: Record<string, unknown>;
+            order: number;
+        }>;
+    }>;
+}
+
+export interface UpdateCompleteCourseData {
+    courseData: CreateCourseData;
+    existingModulesData: Array<{
+        module_id: number;
+        order: number;
+    }>;
+    newModulesData: Array<{
+        title: string;
+        description: string;
+        order: number;
+        lessons: Array<{
+            id: string;
+            title: string;
+            type: "VIDEO" | "QUIZ" | "TEXT";
+            description: string;
+            content: Record<string, unknown>;
+            order: number;
+        }>;
+    }>;
+    courseModulesData: Array<{
+        id: number;
+        title: string;
+        description: string;
+        order: number;
+        lessons: Array<{
+            id: string;
+            title: string;
+            type: "VIDEO" | "QUIZ" | "TEXT";
+            description: string;
+            content: Record<string, unknown>;
+            order: number;
+        }>;
+    }>;
+}
+
+export interface TeacherCourseQueryParams {
     search?: string;
     limit?: number;
     offset?: number;
@@ -21,6 +77,19 @@ interface TeacherCourseQueryParams {
 class TeacherService {
     async createCourse(courseData: CreateCourseData): Promise<Course> {
         const response = await api.post("/course/", courseData);
+        return response.data;
+    }
+
+    async createCompleteCourse(courseData: CreateCompleteCourseData): Promise<Course> {
+        const response = await api.post("/course/create-complete", courseData);
+        return response.data;
+    }
+
+    async updateCompleteCourse(
+        courseId: number,
+        courseData: UpdateCompleteCourseData
+    ): Promise<Course> {
+        const response = await api.put(`/course/${courseId}/update-complete`, courseData);
         return response.data;
     }
 
@@ -39,7 +108,7 @@ class TeacherService {
         queryParams.append("limit", limit.toString());
         queryParams.append("offset", offset.toString());
 
-        const response = await api.get(`/teacher/${teacherId}/courses?${queryParams.toString()}`);
+        const response = await api.get(`/teacher/${teacherId}/courses?${queryParams}`);
         return response.data;
     }
 

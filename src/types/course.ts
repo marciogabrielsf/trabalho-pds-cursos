@@ -1,6 +1,15 @@
 import { Teacher } from "./user";
 import { Module } from "./module";
 
+export type CourseDifficulty = "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
+export type CourseCategory =
+    | "PROGRAMMING"
+    | "DESIGN"
+    | "BUSINESS"
+    | "MARKETING"
+    | "PHOTOGRAPHY"
+    | "MUSIC";
+
 export interface Course {
     id: number;
     title: string;

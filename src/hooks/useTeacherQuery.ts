@@ -1,23 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { teacherService } from "@/services/teacherService";
+import {
+    teacherService,
+    CreateCourseData,
+    CreateCompleteCourseData,
+    UpdateCompleteCourseData,
+    TeacherCourseQueryParams,
+} from "@/services/teacherService";
 import { Course } from "@/types/course";
-
-interface CreateCourseData {
-    title: string;
-    description: string;
-    value: number;
-    teacher_id: number;
-    trailer_url: string;
-    thumbnail_url: string;
-    difficulty: "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
-    category: "PROGRAMMING" | "DESIGN" | "BUSINESS" | "MARKETING" | "PHOTOGRAPHY" | "MUSIC";
-}
-
-interface TeacherCourseQueryParams {
-    search?: string;
-    limit?: number;
-    offset?: number;
-}
 
 export const useTeacherCourses = (teacherId: number, params: TeacherCourseQueryParams = {}) => {
     return useQuery({
@@ -42,6 +31,45 @@ export const useCreateCourse = () => {
             queryClient.setQueryData(["teacher-courses"], (old: Course[] | undefined) => {
                 return old ? [newCourse, ...old] : [newCourse];
             });
+        },
+    });
+};
+
+export const useCreateCompleteCourse = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (courseData: CreateCompleteCourseData) =>
+            teacherService.createCompleteCourse(courseData),
+        onSuccess: (newCourse: Course) => {
+            // Invalidar query dos cursos do professor
+            queryClient.invalidateQueries({ queryKey: ["teacher-courses"] });
+
+            // Adicionar curso otimisticamente ao cache
+            queryClient.setQueryData(["teacher-courses"], (old: Course[] | undefined) => {
+                return old ? [newCourse, ...old] : [newCourse];
+            });
+        },
+    });
+};
+
+export const useUpdateCompleteCourse = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({
+            courseId,
+            courseData,
+        }: {
+            courseId: number;
+            courseData: UpdateCompleteCourseData;
+        }) => teacherService.updateCompleteCourse(courseId, courseData),
+        onSuccess: (updatedCourse: Course) => {
+            // Invalidar query dos cursos do professor
+            queryClient.invalidateQueries({ queryKey: ["teacher-courses"] });
+
+            // Atualizar curso específico no cache
+            queryClient.setQueryData(["course", updatedCourse.id], updatedCourse);
         },
     });
 };

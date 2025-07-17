@@ -59,7 +59,7 @@ export default function TeacherDashboard() {
         <div className="flex min-h-screen bg-gray-50">
             <TeacherSidebar activeItem="courses" />
 
-            <div className="flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col h-screen overflow-y-auto">
                 {/* Header */}
                 <header className="bg-white border-b border-gray-200 px-6 py-4">
                     <div className="flex items-center justify-between">

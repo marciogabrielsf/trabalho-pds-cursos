@@ -1,41 +1,44 @@
 "use client";
 
 import React from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { TeacherSidebar } from "@/components/dashboard/layout";
 import { ArrowLeft, ArrowRight, Edit } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { StatusDialog } from "@/components/ui/StatusDialog";
 import CourseBasicInfo from "@/components/dashboard/courses/wizard/CourseBasicInfo";
 import ExistingModules from "@/components/dashboard/courses/wizard/ExistingModules";
 import NewModules from "@/components/dashboard/courses/wizard/NewModules";
 import CourseEditSummary from "@/components/dashboard/courses/wizard/CourseEditSummary";
-import { CourseEditLoading, CourseEditError } from "@/components/dashboard/courses/wizard/CourseEditStates";
-import { 
-    useCourseEdit, 
-    useCourseEditAPI, 
-    useCourseEditSave, 
-    useWizardSteps 
-} from "@/hooks";
+import {
+    CourseEditLoading,
+    CourseEditError,
+} from "@/components/dashboard/courses/wizard/CourseEditStates";
+import { useCourseEdit, useCourseEditAPI, useWizardSteps, useStatusDialog } from "@/hooks";
+import { useUpdateCompleteCourse } from "@/hooks/useTeacherQuery";
 
 export default function EditCoursePage() {
     const params = useParams();
+    const router = useRouter();
     const courseId = Number(params.id);
-    
+
     // Custom hooks para gerenciar estado e lógica
-    const { 
-        wizardData, 
-        updateWizardData, 
-        isLoading, 
-        error, 
-        courseInfo, 
-        navigateBack, 
+    const {
+        wizardData,
+        updateWizardData,
+        isLoading,
+        error,
+        courseInfo,
+        navigateBack,
         navigateToTeacherDashboard,
-        user 
+        user,
     } = useCourseEdit(courseId);
-    
-    const { currentStep, steps, handleNext, handleBack, canGoNext, canGoBack, isLastStep } = useWizardSteps();
+
+    const { currentStep, steps, handleNext, handleBack, canGoNext, canGoBack, isLastStep } =
+        useWizardSteps();
     const apiData = useCourseEditAPI(wizardData, user?.id || 1);
-    const { handleSave, isLoading: isSaving } = useCourseEditSave(courseId, user?.id || 1);
+    const updateCompleteCourse = useUpdateCompleteCourse();
+    const { dialogState, closeDialog, showSuccess, showError } = useStatusDialog();
 
     // Estados de carregamento e erro
     if (isLoading) {
@@ -62,7 +65,42 @@ export default function EditCoursePage() {
     };
 
     const handleFinish = () => {
-        handleSave(apiData);
+        updateCompleteCourse.mutate(
+            { courseId, courseData: apiData },
+            {
+                onSuccess: () => {
+                    showSuccess(
+                        "Curso Atualizado com Sucesso!",
+                        "Todas as alterações foram salvas. Você será redirecionado para o painel do curso.",
+                        {
+                            label: "Ir para o Curso",
+                            onClick: () => {
+                                closeDialog();
+                                router.push(`/dashboard/teacher/course/${courseId}`);
+                            },
+                        }
+                    );
+                },
+                onError: (error) => {
+                    console.error("Erro ao salvar curso:", error);
+                    showError(
+                        "Erro ao Salvar Curso",
+                        "Ocorreu um erro ao tentar salvar as alterações. Por favor, tente novamente.",
+                        {
+                            label: "Tentar Novamente",
+                            onClick: () => {
+                                closeDialog();
+                                handleFinish();
+                            },
+                        },
+                        {
+                            label: "Cancelar",
+                            onClick: closeDialog,
+                        }
+                    );
+                },
+            }
+        );
     };
 
     return (
@@ -170,10 +208,12 @@ export default function EditCoursePage() {
                                 ) : (
                                     <Button
                                         onClick={handleFinish}
-                                        disabled={isSaving}
+                                        disabled={updateCompleteCourse.isPending}
                                         className="bg-orange-600 hover:bg-orange-700"
                                     >
-                                        {isSaving ? "Salvando..." : "Salvar Alterações"}
+                                        {updateCompleteCourse.isPending
+                                            ? "Salvando..."
+                                            : "Salvar Alterações"}
                                     </Button>
                                 )}
                             </div>
@@ -181,6 +221,17 @@ export default function EditCoursePage() {
                     </div>
                 </main>
             </div>
+
+            {/* Status Dialog */}
+            <StatusDialog
+                isOpen={dialogState.isOpen}
+                onClose={closeDialog}
+                type={dialogState.type}
+                title={dialogState.title}
+                description={dialogState.description}
+                primaryAction={dialogState.primaryAction}
+                secondaryAction={dialogState.secondaryAction}
+            />
         </div>
     );
 }

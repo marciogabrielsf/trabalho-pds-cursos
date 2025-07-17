@@ -226,6 +226,7 @@ const TeacherCourseLearningPage: React.FC = () => {
                             variants={itemVariants}
                         >
                             <CourseContents
+                                courseId={courseId}
                                 isTeacher
                                 modules={courseLearningData.course_data.modules}
                                 onLessonClick={handleLessonClick}

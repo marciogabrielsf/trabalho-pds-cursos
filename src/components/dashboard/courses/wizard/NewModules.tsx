@@ -3,7 +3,6 @@ import { CourseWizardData } from "@/types/courseWizard";
 import { Plus, Edit, Trash2, Menu } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { useTeacherModules } from "@/hooks/useModuleQuery";
-import Button from "@/components/ui/Button";
 import {
     DndContext,
     closestCenter,
@@ -120,7 +119,6 @@ function SortableModule({
     onUpdateLessons,
     onEditLesson,
     onDeleteLesson,
-    onAddLesson,
     isExisting = false,
 }: {
     module: ModuleData;
@@ -130,7 +128,6 @@ function SortableModule({
     onUpdateLessons: (moduleId: string, lessons: LessonData[]) => void;
     onEditLesson: (moduleId: string, lessonId: string) => void;
     onDeleteLesson: (moduleId: string, lessonId: string) => void;
-    onAddLesson: (moduleId: string) => void;
     isExisting?: boolean;
 }) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -243,19 +240,6 @@ function SortableModule({
                         ))}
                     </SortableContext>
                 </DndContext>
-
-                {/* Botão para adicionar nova lição */}
-                <div className="mt-4 pt-3 border-t border-gray-200">
-                    <Button
-                        type="button"
-                        variant="secondary"
-                        onClick={() => onAddLesson(module.id)}
-                        className="w-full"
-                    >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Adicionar Lição
-                    </Button>
-                </div>
             </div>
         </div>
     );
@@ -411,12 +395,6 @@ export default function NewModules({ data, onChange }: NewModulesProps) {
     const handleEditLesson = (moduleId: string, lessonId: string) => {
         setEditingLesson({ moduleId, lessonId });
         setAddingLessonToModule(null); // Limpar estado de adição
-        setIsLessonModalOpen(true);
-    };
-
-    const handleAddLesson = (moduleId: string) => {
-        setAddingLessonToModule(moduleId);
-        setEditingLesson(null); // Limpar estado de edição
         setIsLessonModalOpen(true);
     };
 
@@ -590,7 +568,6 @@ export default function NewModules({ data, onChange }: NewModulesProps) {
                                 onUpdateLessons={handleUpdateLessons}
                                 onEditLesson={handleEditLesson}
                                 onDeleteLesson={handleDeleteLesson}
-                                onAddLesson={handleAddLesson}
                                 isExisting={module.isExisting}
                             />
                         ))}

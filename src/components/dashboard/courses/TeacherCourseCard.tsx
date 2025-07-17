@@ -16,6 +16,10 @@ interface TeacherCourseCardProps {
 }
 
 const TeacherCourseCard: React.FC<TeacherCourseCardProps> = ({ course, onEdit, onDelete }) => {
+    if (!course.thumbnail_url || !course.thumbnail_url.startsWith("http")) {
+        course.thumbnail_url = "/placeholder.png";
+    }
+
     return (
         <a
             href={`teacher/course/${course.id}/lesson/${course.firstLessonId || 0}`}

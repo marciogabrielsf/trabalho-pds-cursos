@@ -1,5 +1,5 @@
 import React from "react";
-import { Edit, Book, DollarSign, Plus, PlayCircle, FileText, HelpCircle } from "lucide-react";
+import { Edit, Book, DollarSign, PlayCircle, FileText, HelpCircle } from "lucide-react";
 import { CourseWizardData } from "@/types/courseWizard";
 import { useTeacherModules } from "@/hooks/useModuleQuery";
 import { useAuthStore } from "@/stores/authStore";
@@ -65,52 +65,6 @@ export default function CourseEditSummary({ wizardData, apiData }: CourseEditSum
             </div>
 
             {/* Estatísticas */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div className="bg-blue-50 rounded-lg p-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-blue-600">Total de Módulos</p>
-                            <p className="text-2xl font-bold text-blue-800">
-                                {apiData.stats.totalModules}
-                            </p>
-                        </div>
-                        <Book className="w-8 h-8 text-blue-500" />
-                    </div>
-                </div>
-                <div className="bg-green-50 rounded-lg p-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-green-600">Módulos do Curso</p>
-                            <p className="text-2xl font-bold text-green-800">
-                                {apiData.stats.courseModules}
-                            </p>
-                        </div>
-                        <Edit className="w-8 h-8 text-green-500" />
-                    </div>
-                </div>
-                <div className="bg-purple-50 rounded-lg p-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-purple-600">Novos Módulos</p>
-                            <p className="text-2xl font-bold text-purple-800">
-                                {apiData.stats.newModules}
-                            </p>
-                        </div>
-                        <Plus className="w-8 h-8 text-purple-500" />
-                    </div>
-                </div>
-                <div className="bg-orange-50 rounded-lg p-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-orange-600">Total de Aulas</p>
-                            <p className="text-2xl font-bold text-orange-800">
-                                {apiData.stats.totalLessons}
-                            </p>
-                        </div>
-                        <PlayCircle className="w-8 h-8 text-orange-500" />
-                    </div>
-                </div>
-            </div>
 
             {/* Estrutura do Curso */}
             <div className="bg-white border rounded-lg p-4">
@@ -189,16 +143,6 @@ export default function CourseEditSummary({ wizardData, apiData }: CourseEditSum
                     })}
                 </div>
             </div>
-
-            {/* Dados para API (Debug) */}
-            {process.env.NODE_ENV === "development" && (
-                <div className="mt-6 bg-gray-100 rounded-lg p-4">
-                    <h4 className="font-semibold text-gray-900 mb-2">Dados para API (Debug)</h4>
-                    <pre className="text-xs text-gray-600 overflow-x-auto">
-                        {JSON.stringify(apiData, null, 2)}
-                    </pre>
-                </div>
-            )}
         </div>
     );
 }

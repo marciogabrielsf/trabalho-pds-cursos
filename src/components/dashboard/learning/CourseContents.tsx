@@ -6,6 +6,7 @@ import { Lesson, LessonType } from "@/types/lesson";
 
 interface CourseContentsProps {
     modules: Module[];
+    courseId: number;
     progress?: number;
     onLessonClick: (moduleId: string, lessonId: string) => void;
     onToggleModule: (moduleId: string) => void;
@@ -15,12 +16,12 @@ interface CourseContentsProps {
     isTeacher?: boolean;
 }
 
-const getLessonURL = (moduleId: string, lessonId: string, isTeacher: boolean) => {
+const getLessonURL = (courseId: string, lessonId: string, isTeacher: boolean) => {
     if (isTeacher) {
-        return `/dashboard/teacher/course/${moduleId}/lesson/${lessonId}`;
+        return `/dashboard/teacher/course/${courseId}/lesson/${lessonId}`;
     }
 
-    return `/dashboard/student/my-courses/${moduleId}/lesson/${lessonId}`;
+    return `/dashboard/student/my-courses/${courseId}/lesson/${lessonId}`;
 };
 
 const getLessonIcon = (type: LessonType) => {
@@ -37,6 +38,7 @@ const getLessonIcon = (type: LessonType) => {
 };
 
 const CourseContents: React.FC<CourseContentsProps> = ({
+    courseId,
     modules,
     progress = 0,
     onToggleModule,
@@ -127,7 +129,7 @@ const CourseContents: React.FC<CourseContentsProps> = ({
                                             />
                                         </svg>
                                     </motion.div>
-                                    <span className="text-sm font-medium text-gray-700">
+                                    <span className="text-sm font-medium text-left text-gray-700">
                                         {module.title}
                                     </span>
                                 </div>
@@ -165,7 +167,7 @@ const CourseContents: React.FC<CourseContentsProps> = ({
                                         return (
                                             <a
                                                 href={getLessonURL(
-                                                    module.id.toString(),
+                                                    courseId.toString(),
                                                     lesson.id.toString(),
                                                     isTeacher
                                                 )}
