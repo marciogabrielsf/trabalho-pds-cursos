@@ -156,17 +156,19 @@ const CourseContents: React.FC<CourseContentsProps> = ({
                                 <div className="flex items-center space-x-2">
                                     <div className="flex items-center space-x-1 text-gray-500 text-xs">
                                         <BookOpen size={14} className="text-highlight" />
-                                        <span>Módulo {module.order}</span>
+                                        <span className="whitespace-nowrap">
+                                            Módulo {module.order}
+                                        </span>
                                     </div>
                                     <div className="flex items-center space-x-1 text-gray-500">
                                         <Clock className="text-secondary" size={14} />
-                                        <span className="text-xs">
+                                        <span className="text-xs whitespace-nowrap">
                                             {module.lesson_quantity} Aulas
                                         </span>
                                     </div>
                                     <div className="flex items-center space-x-1 text-gray-500">
                                         <CheckCircle className="text-green-600" size={14} />
-                                        <span className="text-xs">
+                                        <span className="text-xs whitespace-nowrap">
                                             ({completedInModule}/{module.lesson_quantity})
                                         </span>
                                     </div>

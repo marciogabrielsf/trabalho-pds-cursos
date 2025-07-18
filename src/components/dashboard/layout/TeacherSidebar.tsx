@@ -49,7 +49,7 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ activeItem = "courses",
                             className="rounded-full"
                         />
                     </div>
-                    <span className="text-xl font-bold text-secondary">{APP_NAME}</span>
+                    <span className="text-xl font-bold text-black">{APP_NAME}</span>
                 </div>
 
                 <div className="flex flex-col justify-between h-full">

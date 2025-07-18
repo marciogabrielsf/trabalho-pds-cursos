@@ -9,15 +9,25 @@ import SimpleSearch from "@/components/dashboard/courses/SimpleSearch";
 import { useTeacherCourses, useCreateCourse, useDeleteCourse } from "@/hooks/useTeacherQuery";
 import { CourseFormData } from "@/components/dashboard/courses/CreateCourseModal";
 import { Course } from "@/types/course";
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, AlertTriangle } from "lucide-react";
 import ImgPH from "@/../public/img_ph.jpeg";
 import Image from "next/image";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function TeacherDashboard() {
     const { user } = useAuthStore();
     const router = useRouter();
     const [searchTerm, setSearchTerm] = useState("");
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
 
     // Queries
     const { data: courses = [], isLoading } = useTeacherCourses(user?.id || 0, {
@@ -46,15 +56,26 @@ export default function TeacherDashboard() {
     };
 
     const handleDeleteCourse = async (course: Course) => {
-        if (window.confirm(`Tem certeza que deseja excluir o curso "${course.title}"?`)) {
-            try {
-                await deleteCourseMutation.mutateAsync(course.id);
-                alert("Curso excluído com sucesso!");
-            } catch (error) {
-                alert("Erro ao excluir curso. Tente novamente.");
-                console.error("Error deleting course:", error);
-            }
+        setCourseToDelete(course);
+        setIsDeleteModalOpen(true);
+    };
+
+    const confirmDeleteCourse = async () => {
+        if (!courseToDelete) return;
+
+        try {
+            await deleteCourseMutation.mutateAsync(courseToDelete.id);
+            setIsDeleteModalOpen(false);
+            setCourseToDelete(null);
+        } catch (error) {
+            alert("Erro ao excluir curso. Tente novamente.");
+            console.error("Error deleting course:", error);
         }
+    };
+
+    const cancelDeleteCourse = () => {
+        setIsDeleteModalOpen(false);
+        setCourseToDelete(null);
     };
 
     return (
@@ -144,6 +165,54 @@ export default function TeacherDashboard() {
                 onSubmit={handleCreateCourse}
                 isLoading={createCourseMutation.isPending}
             />
+
+            {/* Delete Confirmation Modal */}
+            <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-red-600">
+                            <AlertTriangle className="h-5 w-5" />
+                            Confirmar Exclusão
+                        </DialogTitle>
+                        <DialogDescription className="text-left">
+                            Tem certeza que deseja excluir o curso{" "}
+                            <span className="font-semibold">
+                                &ldquo;{courseToDelete?.title}&rdquo;
+                            </span>
+                            ?
+                            <br />
+                            <br />
+                            Esta ação não pode ser desfeita. Todos os dados do curso, incluindo
+                            módulos, aulas e progresso dos alunos serão permanentemente removidos.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2">
+                        <button
+                            type="button"
+                            onClick={cancelDeleteCourse}
+                            disabled={deleteCourseMutation.isPending}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="button"
+                            onClick={confirmDeleteCourse}
+                            disabled={deleteCourseMutation.isPending}
+                            className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {deleteCourseMutation.isPending ? (
+                                <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                    Excluindo...
+                                </>
+                            ) : (
+                                "Excluir Curso"
+                            )}
+                        </button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { MessageSquare, Clock, User, Send } from "lucide-react";
+import React from "react";
+import { MessageSquare, Clock, User } from "lucide-react";
 import { Comment } from "@/types/comment";
 import { motion } from "framer-motion";
 import { formatDateBR, formatTimeBR } from "@/lib/dateUtils";
@@ -9,8 +9,8 @@ interface ClassroomPostProps {
     onAddComment?: (postId: string, comment: string) => void;
 }
 
-const ClassroomPost: React.FC<ClassroomPostProps> = ({ comment, onAddComment }) => {
-    const [newComment, setNewComment] = useState("");
+const ClassroomPost: React.FC<ClassroomPostProps> = ({ comment }) => {
+    // const [newComment, setNewComment] = useState("");
 
     const getPostIcon = (userRole: string) => {
         switch (userRole) {
@@ -23,12 +23,12 @@ const ClassroomPost: React.FC<ClassroomPostProps> = ({ comment, onAddComment }) 
         }
     };
 
-    const handleAddComment = () => {
-        if (newComment.trim() && onAddComment) {
-            onAddComment(comment.id.toString(), newComment);
-            setNewComment("");
-        }
-    };
+    // const handleAddComment = () => {
+    //     if (newComment.trim() && onAddComment) {
+    //         onAddComment(comment.id.toString(), newComment);
+    //         setNewComment("");
+    //     }
+    // };
 
     return (
         <motion.div
@@ -71,7 +71,7 @@ const ClassroomPost: React.FC<ClassroomPostProps> = ({ comment, onAddComment }) 
                         </div>
                     </div>
 
-                    {onAddComment && (
+                    {/* {onAddComment && (
                         <div className="mt-4 pt-4 border-t border-gray-100">
                             <div className="flex gap-3">
                                 <input
@@ -91,7 +91,7 @@ const ClassroomPost: React.FC<ClassroomPostProps> = ({ comment, onAddComment }) 
                                 </button>
                             </div>
                         </div>
-                    )}
+                    )} */}
                 </div>
             </div>
         </motion.div>
