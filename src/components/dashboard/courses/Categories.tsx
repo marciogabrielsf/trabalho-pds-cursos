@@ -9,7 +9,7 @@ import {
     BarChart3,
     Beaker,
 } from "lucide-react";
-import { Category } from "../../stores/courseStore";
+import { Category } from "@/stores/courseStore";
 
 interface CategoriesProps {
     categories: Category[];

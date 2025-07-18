@@ -30,13 +30,21 @@ const StudentDashboard: React.FC = () => {
 
     const courses = useMemo(() => courseData || [], [courseData]);
 
+    const categories = mockCategories;
+
     // Filtrar cursos por categoria e busca combinados
     const filteredCourses = useMemo(() => {
         let filtered = courses;
 
         // Aplicar filtro de categoria
         if (selectedCategory) {
-            filtered = filtered.filter((course: Course) => course.category === selectedCategory);
+            // Encontrar a categoria selecionada para obter o valor da API
+            const category = categories.find((c) => c.id === selectedCategory);
+            if (category?.apiValue) {
+                filtered = filtered.filter(
+                    (course: Course) => course.category === category.apiValue
+                );
+            }
         }
 
         // Aplicar filtro de busca (adicional ao filtro da API)
@@ -50,9 +58,7 @@ const StudentDashboard: React.FC = () => {
         }
 
         return filtered;
-    }, [courses, selectedCategory, searchQuery]);
-
-    const categories = mockCategories;
+    }, [courses, selectedCategory, searchQuery, categories]);
 
     // Função para lidar com mudanças na busca
     const handleSearchChange = (query: string) => {

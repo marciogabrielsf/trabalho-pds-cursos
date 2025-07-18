@@ -16,6 +16,27 @@ export const parseUTCDate = (dateString: string): Date => {
 };
 
 /**
+ * Corrige o fuso horário de notificações que vêm da API
+ * Força interpretação como UTC e converte para timezone local brasileiro (UTC-3)
+ * @param dateString - String de data da notificação
+ * @returns Date object correto para o timezone brasileiro
+ */
+export const parseNotificationDate = (dateString: string): Date => {
+    // Remove qualquer indicador de timezone e força como UTC
+    const cleanDateString = dateString.replace(/[+-]\d{2}:\d{2}$/g, "").replace("Z", "");
+
+    // Cria data interpretando como UTC
+    const utcDate = new Date(cleanDateString + "Z");
+
+    // Se a data é inválida, tenta com a string original
+    if (isNaN(utcDate.getTime())) {
+        return new Date(dateString);
+    }
+
+    return utcDate;
+};
+
+/**
  * Formata uma data para o padrão brasileiro (dd de mmmm)
  * @param dateString - String de data UTC
  * @returns Data formatada em português brasileiro

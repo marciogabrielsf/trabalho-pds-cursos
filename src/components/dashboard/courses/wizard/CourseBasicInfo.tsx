@@ -1,6 +1,6 @@
 import React from "react";
 import Input from "@/components/ui/Input";
-import { CourseWizardData } from "@/app/dashboard/teacher/create-course/page";
+import { CourseWizardData } from "@/types";
 
 interface CourseBasicInfoProps {
     data: CourseWizardData;

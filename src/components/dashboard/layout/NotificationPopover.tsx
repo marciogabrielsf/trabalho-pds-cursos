@@ -5,6 +5,7 @@ import { Bell, Check, X, CheckCheck, Wifi, WifiOff } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { parseNotificationDate } from "@/lib/dateUtils";
 import { useNotificationContext } from "@/contexts/NotificationContext";
 import { useNotificationFilters } from "@/hooks/useNotificationFilters";
 import type { Notification } from "@/types/notification";
@@ -215,7 +216,9 @@ const NotificationPopoverContent: React.FC<NotificationPopoverContentProps> = ()
                                                 </p>
                                                 <p className="text-xs text-gray-500 mt-2">
                                                     {formatDistanceToNow(
-                                                        new Date(notification.created_at),
+                                                        parseNotificationDate(
+                                                            notification.created_at
+                                                        ),
                                                         {
                                                             addSuffix: true,
                                                             locale: ptBR,
