@@ -27,7 +27,7 @@ export class NotificationService {
     // Marcar notificação como lida
     static async markAsRead(notificationId: number): Promise<void> {
         try {
-            await api.put(`/notifications/${notificationId}/read`);
+            await api.patch(`/notifications/${notificationId}/read`);
         } catch (error) {
             console.error("Erro ao marcar notificação como lida:", error);
             throw error;

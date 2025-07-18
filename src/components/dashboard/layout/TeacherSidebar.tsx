@@ -5,6 +5,7 @@ import { APP_NAME } from "@/config/config";
 import { useAuthStore } from "@/stores/authStore";
 import Image from "next/image";
 import Logo from "@/../public/logo.jpeg";
+import Link from "next/link";
 
 interface TeacherSidebarProps {
     activeItem?: string;
@@ -39,18 +40,20 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ activeItem = "courses",
         <aside className="min-w-64 bg-white border-r border-gray-200 h-screen shadow-md">
             <div className="p-6 h-full flex flex-col">
                 {/* Logo */}
-                <div className="flex items-center space-x-2 mb-8">
-                    <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
-                        <Image
-                            src={Logo}
-                            alt="Logo"
-                            width={40}
-                            height={40}
-                            className="rounded-full"
-                        />
+                <Link href="/">
+                    <div className="flex items-center space-x-2 mb-8">
+                        <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+                            <Image
+                                src={Logo}
+                                alt="Logo"
+                                width={40}
+                                height={40}
+                                className="rounded-full"
+                            />
+                        </div>
+                        <span className="text-xl font-bold text-black">{APP_NAME}</span>
                     </div>
-                    <span className="text-xl font-bold text-black">{APP_NAME}</span>
-                </div>
+                </Link>
 
                 <div className="flex flex-col justify-between h-full">
                     <div className="mb-6">

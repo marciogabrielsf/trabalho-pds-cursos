@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
 import { TeacherSidebar } from "@/components/dashboard/layout";
@@ -30,9 +30,21 @@ export default function TeacherDashboard() {
     const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
 
     // Queries
-    const { data: courses = [], isLoading } = useTeacherCourses(user?.id || 0, {
-        search: searchTerm,
-    });
+    const { data: courses = [], isLoading } = useTeacherCourses(user?.id || 0);
+
+    // Filtrar cursos localmente com base no termo de busca
+    const filteredCourses = useMemo(() => {
+        if (!searchTerm.trim()) {
+            return courses;
+        }
+
+        return courses.filter(
+            (course) =>
+                course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                course.category.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [courses, searchTerm]);
 
     const createCourseMutation = useCreateCourse();
     const deleteCourseMutation = useDeleteCourse();
@@ -101,16 +113,34 @@ export default function TeacherDashboard() {
                     {/* Courses Section */}
                     <div className="bg-white rounded-lg shadow-sm p-6">
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-semibold text-gray-900">Seus Cursos</h2>
+                            <div>
+                                <h2 className="text-xl font-semibold text-gray-900">Seus Cursos</h2>
+                                {searchTerm && (
+                                    <p className="text-sm text-gray-600 mt-1">
+                                        {filteredCourses.length} resultado(s) encontrado(s) para
+                                        &ldquo;{searchTerm}&rdquo;
+                                    </p>
+                                )}
+                            </div>
                         </div>
 
                         {/* Search */}
-                        <div className="mb-6 flex justify-between">
-                            <SimpleSearch
-                                value={searchTerm}
-                                onChange={setSearchTerm}
-                                placeholder="Pesquise seu curso aqui..."
-                            />
+                        <div className="mb-6 flex justify-between items-center gap-4">
+                            <div className="flex-1 max-w-md">
+                                <SimpleSearch
+                                    value={searchTerm}
+                                    onChange={setSearchTerm}
+                                    placeholder="Pesquise seu curso aqui..."
+                                />
+                                {searchTerm && (
+                                    <button
+                                        onClick={() => setSearchTerm("")}
+                                        className="mt-2 text-xs text-gray-500 hover:text-gray-700 underline"
+                                    >
+                                        Limpar busca
+                                    </button>
+                                )}
+                            </div>
                             <a
                                 href="/dashboard/teacher/create-course"
                                 className="bg-secondary font-bold text-white px-6 py-2 rounded-lg hover:bg-purple-500 transition-colors flex items-center space-x-2"
@@ -122,7 +152,7 @@ export default function TeacherDashboard() {
 
                         {/* Courses List */}
                         <TeacherCoursesList
-                            courses={courses}
+                            courses={filteredCourses}
                             isLoading={isLoading}
                             onEditCourse={handleEditCourse}
                             onDeleteCourse={handleDeleteCourse}

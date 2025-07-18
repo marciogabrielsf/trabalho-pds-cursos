@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Bell, Check, X, CheckCheck, Wifi, WifiOff } from "lucide-react";
+import { Bell, Check, X, CheckCheck } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,6 @@ const NotificationPopoverContent: React.FC<NotificationPopoverContentProps> = ()
     const {
         notifications,
         unreadCount,
-        isConnected,
         isLoading,
         error,
         markAsRead,
@@ -31,18 +30,6 @@ const NotificationPopoverContent: React.FC<NotificationPopoverContentProps> = ()
 
     const { filters, filteredNotifications, setShowAll, setShowUnread } =
         useNotificationFilters(notifications);
-
-    // Ícones por tipo de notificação
-    const getNotificationIcon = (type: Notification["type"]) => {
-        const icons = {
-            new_task: "📋",
-            task_graded: "✅",
-            new_delivery: "📤",
-            deadline_warning: "⚠️",
-            course_update: "📚",
-        };
-        return icons[type] || "🔔";
-    };
 
     // Cores por tipo
     const getNotificationColor = (type: Notification["type"]) => {
@@ -86,23 +73,6 @@ const NotificationPopoverContent: React.FC<NotificationPopoverContentProps> = ()
                 <div className="flex items-center justify-between mb-3">
                     <h4 className="text-lg font-semibold text-gray-900">Notificações</h4>
                     <div className="flex items-center space-x-2">
-                        {/* Status de conexão */}
-                        <div className="flex items-center space-x-1">
-                            {isConnected ? (
-                                <Wifi size={14} className="text-green-500" />
-                            ) : (
-                                <WifiOff size={14} className="text-red-500" />
-                            )}
-                            <span
-                                className={cn(
-                                    "text-xs",
-                                    isConnected ? "text-green-600" : "text-red-600"
-                                )}
-                            >
-                                {isConnected ? "Online" : "Offline"}
-                            </span>
-                        </div>
-
                         {/* Counter */}
                         {unreadCount > 0 && (
                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
@@ -192,13 +162,6 @@ const NotificationPopoverContent: React.FC<NotificationPopoverContentProps> = ()
                                 )}
                             >
                                 <div className="flex items-start space-x-3">
-                                    {/* Ícone */}
-                                    <div className="flex-shrink-0 mt-1">
-                                        <span className="text-lg">
-                                            {getNotificationIcon(notification.type)}
-                                        </span>
-                                    </div>
-
                                     {/* Conteúdo */}
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-start justify-between">

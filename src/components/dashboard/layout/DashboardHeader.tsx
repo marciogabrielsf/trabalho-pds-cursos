@@ -1,12 +1,9 @@
 import React from "react";
-import { LogOut } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
-import { useRouter } from "next/navigation";
 import NotificationBadge from "./NotificationBadge";
 
 const DashboardHeader: React.FC = () => {
-    const { user, logout } = useAuthStore();
-    const router = useRouter();
+    const { user } = useAuthStore();
 
     const today = new Date().toLocaleDateString("pt-BR", {
         weekday: "long",
@@ -14,11 +11,6 @@ const DashboardHeader: React.FC = () => {
         month: "long",
         day: "numeric",
     });
-
-    const handleLogout = () => {
-        logout();
-        router.push("/");
-    };
 
     return (
         <header className="bg-white px-6 py-4">
@@ -39,13 +31,6 @@ const DashboardHeader: React.FC = () => {
                 {/* Perfil do usuário */}
                 <div className="flex items-center space-x-2">
                     <NotificationBadge />
-                    <button
-                        onClick={handleLogout}
-                        className="flex items-center p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"
-                        title="Sair"
-                    >
-                        <LogOut size={20} />
-                    </button>
                 </div>
             </div>
         </header>
