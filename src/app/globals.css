@@ -125,3 +125,7 @@ button {
     @apply bg-background text-foreground;
   }
 }
+
+input, textarea {
+  outline: none;
+}

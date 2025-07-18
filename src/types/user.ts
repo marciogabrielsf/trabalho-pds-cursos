@@ -1,10 +1,12 @@
-export interface Student {
-    id: number;
-    name: string;
-    email: string;
+export interface Student extends User {
+    role: "student";
 }
 
-export interface Teacher {
+export interface Teacher extends User {
+    role: "teacher";
+}
+
+export interface User {
     id: number;
     name: string;
     email: string;

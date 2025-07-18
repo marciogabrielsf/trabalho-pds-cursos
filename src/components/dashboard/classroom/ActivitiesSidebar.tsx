@@ -8,24 +8,24 @@ import {
     ChevronRight,
     CheckCircle,
     AlertCircle,
+    Plus,
 } from "lucide-react";
-
-interface Activity {
-    id: string;
-    title: string;
-    type: "assignment" | "presentation" | "project";
-    status: "pending" | "completed" | "late";
-    dueDate?: string;
-    description?: string;
-}
+import { Task } from "@/types/activity";
 
 interface ActivitiesSidebarProps {
-    activities: Activity[];
-    onActivityClick?: (activityId: string) => void;
+    activities: Task[];
+    onActivityClick?: (activityId: number) => void;
+    onNewActivity?: () => void;
+    userRole?: "student" | "teacher";
 }
 
-const ActivitiesSidebar: React.FC<ActivitiesSidebarProps> = ({ activities, onActivityClick }) => {
-    const getActivityIcon = (type: string) => {
+const ActivitiesSidebar: React.FC<ActivitiesSidebarProps> = ({
+    activities,
+    onActivityClick,
+    onNewActivity,
+    userRole = "student",
+}) => {
+    const getActivityIcon = (type?: string) => {
         switch (type) {
             case "assignment":
                 return <Award className="text-green-500" size={20} />;
@@ -38,7 +38,7 @@ const ActivitiesSidebar: React.FC<ActivitiesSidebarProps> = ({ activities, onAct
         }
     };
 
-    const getActivityTypeLabel = (type: string) => {
+    const getActivityTypeLabel = (type?: string) => {
         switch (type) {
             case "assignment":
                 return "Prova";
@@ -46,12 +46,14 @@ const ActivitiesSidebar: React.FC<ActivitiesSidebarProps> = ({ activities, onAct
                 return "Apresentação";
             case "project":
                 return "Projeto";
+            case "quiz":
+                return "Quiz";
             default:
                 return "Atividade";
         }
     };
 
-    const getActivityStatusIcon = (status: string) => {
+    const getActivityStatusIcon = (status?: string) => {
         switch (status) {
             case "completed":
                 return <CheckCircle className="text-green-500" size={16} />;
@@ -65,27 +67,42 @@ const ActivitiesSidebar: React.FC<ActivitiesSidebarProps> = ({ activities, onAct
     return (
         <div className="w-80 bg-white shadow-lg border-l border-gray-200 p-6">
             <div className="sticky top-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Atividades</h3>
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Atividades</h3>
+                </div>
 
                 <div className="space-y-3">
                     {activities.map((activity) => (
                         <ActivityCard
                             key={activity.id}
                             activity={activity}
-                            icon={getActivityIcon(activity.type)}
-                            typeLabel={getActivityTypeLabel(activity.type)}
-                            statusIcon={getActivityStatusIcon(activity.status)}
+                            icon={getActivityIcon()}
+                            typeLabel={getActivityTypeLabel()}
+                            statusIcon={getActivityStatusIcon()}
                             onClick={() => onActivityClick?.(activity.id)}
                         />
                     ))}
                 </div>
+
+                {/* Botão Nova Atividade para Professor */}
+                {userRole === "teacher" && onNewActivity && (
+                    <div className="mt-6 pt-4 border-t border-gray-200">
+                        <button
+                            onClick={onNewActivity}
+                            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-secondary text-white rounded-full hover:bg-purple-700 transition-colors font-medium"
+                        >
+                            <Plus size={20} />
+                            Nova Atividade
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
 
 interface ActivityCardProps {
-    activity: Activity;
+    activity: Task;
     icon: React.ReactNode;
     typeLabel: string;
     statusIcon: React.ReactNode;

@@ -18,13 +18,27 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
 
     console.log("CourseCard component rendered with course:", course);
 
+    const isValidUrl = (url: string): boolean => {
+        try {
+            new URL(url);
+            return true;
+        } catch {
+            return false;
+        }
+    };
+
+    const courseThumbnail =
+        course.thumbnail_url && isValidUrl(course.thumbnail_url)
+            ? course.thumbnail_url
+            : "/placeholder.png";
+
     const cardContent = (
         <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg hover:-translate-y-2 transition-all duration-200 cursor-pointer group">
             {/* Imagem do curso */}
             <div className="relative">
                 <div className="w-full h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
                     <Image
-                        src={course.thumbnail_url || "/placeholder.png"}
+                        src={courseThumbnail || "/placeholder.png"}
                         alt={course.title}
                         layout="fill"
                         objectFit="cover"

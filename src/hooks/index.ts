@@ -7,8 +7,9 @@ export * from "./useCourseEditAPI";
 export * from "./useCourseEditSave";
 export * from "./useWizardSteps";
 export * from "./useStatusDialog";
+export * from "./useCommentQuery";
+export * from "./useTaskQuery";
 
-// Hook simplificado para autenticação local (baseado no Zustand)
 import { useAuthStore } from "@/stores/authStore";
 
 export const useAuthLocal = () => {

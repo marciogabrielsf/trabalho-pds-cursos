@@ -228,6 +228,7 @@ const CourseLearningPage: React.FC = () => {
                         >
                             <CourseContents
                                 modules={courseLearningData.course_data.modules}
+                                courseId={courseId}
                                 progress={15}
                                 onLessonClick={handleLessonClick}
                                 onToggleModule={handleToggleModule}
@@ -244,6 +245,7 @@ const CourseLearningPage: React.FC = () => {
                         <Classroom
                             courseTitle={courseLearningData.title}
                             instructor={courseLearningData.teacher_name}
+                            courseId={courseId}
                         />
                     </div>
                 );

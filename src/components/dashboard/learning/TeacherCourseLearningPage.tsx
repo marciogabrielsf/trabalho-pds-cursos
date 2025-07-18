@@ -244,6 +244,7 @@ const TeacherCourseLearningPage: React.FC = () => {
                         <Classroom
                             courseTitle={courseLearningData.title}
                             instructor={courseLearningData.teacher_name}
+                            courseId={courseId}
                         />
                     </div>
                 );

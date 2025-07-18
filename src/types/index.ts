@@ -6,3 +6,5 @@ export * from "./lesson";
 export * from "./module";
 export * from "./user";
 export * from "./ui";
+export * from "./comment";
+export * from "./activity";

@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { X, Users, Eye, CheckCircle, Clock, BarChart3 } from "lucide-react";
+import { formatDateTimeBR } from "@/lib/dateUtils";
 
 interface LessonAnalyticsModalProps {
     isOpen: boolean;
@@ -74,16 +75,6 @@ const LessonAnalyticsModal: React.FC<LessonAnalyticsModalProps> = ({
         mockStudentProgress.reduce((acc, student) => acc + student.progress, 0) / totalStudents;
     const averageTimeSpent =
         mockStudentProgress.reduce((acc, student) => acc + student.timeSpent, 0) / totalStudents;
-
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString("pt-BR", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-        });
-    };
 
     if (!isOpen) return null;
 
@@ -221,7 +212,7 @@ const LessonAnalyticsModal: React.FC<LessonAnalyticsModalProps> = ({
                                             {student.attempts}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {formatDate(student.lastAccess)}
+                                            {formatDateTimeBR(student.lastAccess)}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             {student.progress === 100 ? (

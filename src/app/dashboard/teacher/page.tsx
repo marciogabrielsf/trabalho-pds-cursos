@@ -10,6 +10,8 @@ import { useTeacherCourses, useCreateCourse, useDeleteCourse } from "@/hooks/use
 import { CourseFormData } from "@/components/dashboard/courses/CreateCourseModal";
 import { Course } from "@/types/course";
 import { GraduationCap } from "lucide-react";
+import ImgPH from "@/../public/img_ph.jpeg";
+import Image from "next/image";
 
 export default function TeacherDashboard() {
     const { user } = useAuthStore();
@@ -61,7 +63,8 @@ export default function TeacherDashboard() {
 
             <div className="flex-1 flex flex-col h-screen overflow-y-auto">
                 {/* Header */}
-                <header className="bg-white border-b border-gray-200 px-6 py-4">
+                <header className="bg-white border-b flex gap-3 items-center border-gray-200 px-6 py-4">
+                    <Image src={ImgPH} alt="Logo" className="w-16 h-16 rounded-full" />
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-2xl font-bold text-gray-900">

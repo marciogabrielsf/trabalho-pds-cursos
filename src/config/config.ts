@@ -1,1 +1,1 @@
-export const APP_NAME = "COURSUE";
+export const APP_NAME = "CURSED";
