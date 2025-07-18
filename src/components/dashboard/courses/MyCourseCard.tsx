@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Clock, Users } from "lucide-react";
 import { Course } from "@/types/course";
+import { useProgress } from "@/hooks/useProgress";
 import Image from "next/image";
 
 interface MyCourseCardProps {
@@ -9,8 +10,11 @@ interface MyCourseCardProps {
 }
 
 const MyCourseCard: React.FC<MyCourseCardProps> = ({ course }) => {
-    // Progress mock - será implementado quando tiver essa informação na API
-    const progress = 0; // Temporário até ter o progresso real
+    // Usar o hook de progresso real
+    const { progress } = useProgress({
+        courseId: course.id,
+        modules: [], // Array vazio - o progresso será calculado via API
+    });
 
     const getProgressColor = (progress: number) => {
         if (progress >= 80) return "bg-green-500";

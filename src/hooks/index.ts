@@ -11,6 +11,8 @@ export * from "./useCommentQuery";
 export * from "./useTaskQuery";
 export * from "./useNotifications";
 export * from "./useNotificationFilters";
+export * from "./usePurchase";
+export * from "./useProgress";
 
 import { useAuthStore } from "@/stores/authStore";
 

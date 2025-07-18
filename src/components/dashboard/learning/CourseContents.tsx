@@ -1,8 +1,10 @@
 import React from "react";
-import { BookOpen, CheckCircle, Clock, Play, FileText, HelpCircle } from "lucide-react";
+import { BookOpen, CheckCircle, Clock, Play, FileText, HelpCircle, Lock } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import { Module } from "@/types/module";
 import { Lesson, LessonType } from "@/types/lesson";
+import { useProgress } from "@/hooks/useProgress";
 
 interface CourseContentsProps {
     modules: Module[];
@@ -10,7 +12,6 @@ interface CourseContentsProps {
     progress?: number;
     onLessonClick: (moduleId: string, lessonId: string) => void;
     onToggleModule: (moduleId: string) => void;
-    onLessonComplete?: (moduleId: string, lessonId: string) => void;
     expandedModules?: string[];
     currentLesson?: Lesson;
     isTeacher?: boolean;
@@ -40,13 +41,27 @@ const getLessonIcon = (type: LessonType) => {
 const CourseContents: React.FC<CourseContentsProps> = ({
     courseId,
     modules,
-    progress = 0,
+    progress: externalProgress = 0,
     onToggleModule,
-    onLessonComplete,
     expandedModules = [],
     currentLesson,
     isTeacher = false,
 }) => {
+    // Hook de progresso para estudantes
+    const { completeLesson, isCompletingLesson, isLessonCompleted, canAccessLesson, progress } =
+        useProgress({
+            courseId,
+            modules,
+            onSuccess: () => {
+                toast.success("Lição completada com sucesso!");
+            },
+            onError: (error) => {
+                toast.error(`Erro ao completar lição: ${error.message}`);
+            },
+        });
+
+    // Usar progresso do hook ou externo
+    const displayProgress = isTeacher ? externalProgress : progress;
     const itemVariants = {
         initial: { opacity: 0, y: 10 },
         animate: {
@@ -73,7 +88,7 @@ const CourseContents: React.FC<CourseContentsProps> = ({
                         <h2 className="text-xl font-bold text-gray-900">Course Contents</h2>
                         <div className="flex items-center space-x-2">
                             <span className="text-sm text-green-600 font-medium">
-                                {progress}% Completed
+                                {displayProgress}% Completed
                             </span>
                         </div>
                     </div>
@@ -82,7 +97,7 @@ const CourseContents: React.FC<CourseContentsProps> = ({
                         <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
                                 className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                                style={{ width: `${progress}%` }}
+                                style={{ width: `${displayProgress}%` }}
                             />
                         </div>
                     </div>
@@ -93,6 +108,11 @@ const CourseContents: React.FC<CourseContentsProps> = ({
             <div>
                 {modules.map((module, index) => {
                     const isExpanded = expandedModules.includes(module.id.toString());
+
+                    // Calcular lições completadas neste módulo
+                    const completedInModule =
+                        module.lessons?.filter((lesson) => isLessonCompleted(lesson.id)).length ||
+                        0;
 
                     return (
                         <motion.div
@@ -147,7 +167,7 @@ const CourseContents: React.FC<CourseContentsProps> = ({
                                     <div className="flex items-center space-x-1 text-gray-500">
                                         <CheckCircle className="text-green-600" size={14} />
                                         <span className="text-xs">
-                                            (0/{module.lesson_quantity})
+                                            ({completedInModule}/{module.lesson_quantity})
                                         </span>
                                     </div>
                                 </div>
@@ -163,54 +183,107 @@ const CourseContents: React.FC<CourseContentsProps> = ({
                                 <div className="p-4 space-y-2">
                                     {module.lessons?.map((lesson) => {
                                         const isCurrentLesson = currentLesson?.id === lesson.id;
+                                        const isCompleted = isLessonCompleted(lesson.id);
+                                        const canAccess =
+                                            isTeacher || canAccessLesson(module.id, lesson.id);
+
+                                        const handleCheckboxClick = (e: React.MouseEvent) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            if (!isCompleted && !isCompletingLesson) {
+                                                completeLesson(lesson.id);
+                                            }
+                                        };
+
+                                        const handleCheckboxChange = (
+                                            e: React.ChangeEvent<HTMLInputElement>
+                                        ) => {
+                                            // Previne o comportamento padrão do onChange
+                                            e.preventDefault();
+                                        };
 
                                         return (
-                                            <a
-                                                href={getLessonURL(
-                                                    courseId.toString(),
-                                                    lesson.id.toString(),
-                                                    isTeacher
-                                                )}
+                                            <div
                                                 key={lesson.id}
-                                                className={`flex items-center space-x-3 p-3 transition-all duration-200   ${
+                                                className={`flex items-center space-x-3 p-3 transition-all duration-200 ${
                                                     isCurrentLesson
                                                         ? "bg-orange-50 border border-orange-200"
                                                         : "hover:bg-gray-50"
-                                                }`}
+                                                } ${!canAccess ? "opacity-50" : ""}`}
                                             >
-                                                {!isTeacher && (
-                                                    <div className="flex items-center">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={false} // Será baseado no progresso do usuário
-                                                            onChange={(e) => {
-                                                                e.stopPropagation();
-                                                                onLessonComplete?.(
-                                                                    module.id.toString(),
-                                                                    lesson.id.toString()
-                                                                );
-                                                            }}
-                                                            className="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500 focus:ring-2"
-                                                        />
+                                                {canAccess ? (
+                                                    <>
+                                                        {!isTeacher && (
+                                                            <div className="flex items-center">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={isCompleted}
+                                                                    onChange={handleCheckboxChange}
+                                                                    onClick={handleCheckboxClick}
+                                                                    disabled={isCompletingLesson}
+                                                                    className="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500 focus:ring-2"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                        <a
+                                                            href={getLessonURL(
+                                                                courseId.toString(),
+                                                                lesson.id.toString(),
+                                                                isTeacher
+                                                            )}
+                                                            className="flex items-center space-x-3 flex-1"
+                                                        >
+                                                            <div className="flex-1 flex items-center justify-between">
+                                                                <div className="flex items-center space-x-2">
+                                                                    <span
+                                                                        className={`text-sm font-medium ${
+                                                                            isCurrentLesson
+                                                                                ? "text-orange-600"
+                                                                                : "text-gray-900"
+                                                                        }`}
+                                                                    >
+                                                                        {lesson.order}.{" "}
+                                                                        {lesson.title}
+                                                                    </span>
+                                                                    {isCompleted && (
+                                                                        <CheckCircle className="w-4 h-4 text-green-500" />
+                                                                    )}
+                                                                </div>
+                                                                <div className="flex items-center space-x-2">
+                                                                    {getLessonIcon(lesson.type)}
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    </>
+                                                ) : (
+                                                    <div className="flex items-center space-x-3 flex-1">
+                                                        {!isTeacher && (
+                                                            <div className="flex items-center">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={false}
+                                                                    disabled
+                                                                    className="w-4 h-4 text-gray-300 border-gray-300"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                        <div className="flex-1 flex items-center justify-between">
+                                                            <div className="flex items-center space-x-2">
+                                                                <Lock className="w-4 h-4 text-gray-400" />
+                                                                <span className="text-sm font-medium text-gray-500">
+                                                                    {lesson.order}. {lesson.title}
+                                                                </span>
+                                                                <span className="text-xs text-gray-400">
+                                                                    (Complete a lição anterior)
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex items-center space-x-2">
+                                                                {getLessonIcon(lesson.type)}
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 )}
-                                                <div className="flex-1 flex items-center justify-between">
-                                                    <div className="flex items-center space-x-2">
-                                                        <span
-                                                            className={`text-sm font-medium ${
-                                                                isCurrentLesson
-                                                                    ? "text-orange-600"
-                                                                    : "text-gray-900"
-                                                            }`}
-                                                        >
-                                                            {lesson.order}. {lesson.title}
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex items-center space-x-2">
-                                                        {getLessonIcon(lesson.type)}
-                                                    </div>
-                                                </div>
-                                            </a>
+                                            </div>
                                         );
                                     })}
                                 </div>

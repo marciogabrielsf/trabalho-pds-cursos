@@ -231,7 +231,6 @@ const TeacherCourseLearningPage: React.FC = () => {
                                 modules={courseLearningData.course_data.modules}
                                 onLessonClick={handleLessonClick}
                                 onToggleModule={handleToggleModule}
-                                onLessonComplete={() => {}} // Função vazia para professor
                                 expandedModules={expandedModules}
                                 currentLesson={lessonData}
                             />
@@ -241,11 +240,7 @@ const TeacherCourseLearningPage: React.FC = () => {
             case "classroom":
                 return (
                     <div className="flex-1 ">
-                        <Classroom
-                            courseTitle={courseLearningData.title}
-                            instructor={courseLearningData.teacher_name}
-                            courseId={courseId}
-                        />
+                        <Classroom courseId={courseId} />
                     </div>
                 );
             default:

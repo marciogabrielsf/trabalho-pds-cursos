@@ -1,22 +1,47 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
 import CourseHeader from "./CourseHeader";
 import CourseTabs from "./CourseTabs";
 import CourseDescription from "./CourseDescription";
 import PurchasePanel from "./PurchasePanel";
 import CourseDetailsHorizontal from "./CourseDetailsHorizontal";
+import PurchaseConfirmationModal from "./PurchaseConfirmationModal";
+import PurchaseSuccessModal from "./PurchaseSuccessModal";
 import { PaymentOption } from "@/components/ui/PaymentSelector";
 import { DashboardHeader, Sidebar } from "@/components";
 import { useCourseByIdQuery } from "@/hooks/useCourseQuery";
+import { usePurchase } from "@/hooks/usePurchase";
+import { useAuthStore } from "@/stores/authStore";
+import { PaymentMethod } from "@/types/payment";
 
 const CourseDetailsPage: React.FC = () => {
     const params = useParams();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState("description");
+    const [selectedPaymentOption, setSelectedPaymentOption] = useState<PaymentOption | null>(null);
+    const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+    const { user } = useAuthStore();
     const courseId = Number(params.id);
     const { data: course, isLoading, error, isError } = useCourseByIdQuery(courseId);
+
+    const {
+        purchase,
+        isLoading: isPurchasing,
+        reset,
+    } = usePurchase({
+        onSuccess: () => {
+            setShowConfirmationModal(false);
+            setShowSuccessModal(true);
+            toast.success("Compra realizada com sucesso!");
+        },
+        onError: (error: Error) => {
+            toast.error(`Erro na compra: ${error.message}`);
+        },
+    });
 
     // Loading state
     if (isLoading) {
@@ -76,10 +101,52 @@ const CourseDetailsPage: React.FC = () => {
     }
 
     const handlePurchase = (paymentOption: PaymentOption) => {
-        console.log("Compra realizada:", { course, paymentOption });
-        alert(
-            `Compra realizada com sucesso!\nCurso: ${course.title}\nForma de pagamento: ${paymentOption.title}`
-        );
+        if (!user) {
+            toast.error("Você precisa estar logado para fazer a compra.");
+            return;
+        }
+
+        setSelectedPaymentOption(paymentOption);
+        setShowConfirmationModal(true);
+    };
+
+    const handleConfirmPurchase = () => {
+        if (!selectedPaymentOption || !course) return;
+
+        // Mapear o ID da opção de pagamento para o método correto
+        const paymentMethodMap: Record<string, PaymentMethod> = {
+            pix: "pix",
+            billet: "billet",
+            "credit-card": "credit_card",
+        };
+
+        const paymentMethod = paymentMethodMap[selectedPaymentOption.id];
+        if (!paymentMethod) {
+            toast.error("Método de pagamento inválido.");
+            return;
+        }
+
+        purchase({
+            courseId: courseId, // Usar courseId da URL
+            paymentMethod,
+            amount: selectedPaymentOption.price,
+        });
+    };
+
+    const handleCloseConfirmationModal = () => {
+        setShowConfirmationModal(false);
+        setSelectedPaymentOption(null);
+        reset();
+    };
+
+    const handleCloseSuccessModal = () => {
+        setShowSuccessModal(false);
+        setSelectedPaymentOption(null);
+    };
+
+    const handleGoToCourse = () => {
+        setShowSuccessModal(false);
+        router.push(`/dashboard/student/my-courses/${courseId}`); // Usar courseId da URL
     };
 
     // Configurações de animação
@@ -201,6 +268,25 @@ const CourseDetailsPage: React.FC = () => {
                     </motion.div>
                     {/* Tabs section */}
                 </main>
+
+                {/* Modais */}
+                {selectedPaymentOption && (
+                    <PurchaseConfirmationModal
+                        isOpen={showConfirmationModal}
+                        onClose={handleCloseConfirmationModal}
+                        onConfirm={handleConfirmPurchase}
+                        course={course}
+                        paymentOption={selectedPaymentOption}
+                        isLoading={isPurchasing}
+                    />
+                )}
+
+                <PurchaseSuccessModal
+                    isOpen={showSuccessModal}
+                    onClose={handleCloseSuccessModal}
+                    course={course}
+                    onGoToCourse={handleGoToCourse}
+                />
             </motion.div>
         </div>
     );

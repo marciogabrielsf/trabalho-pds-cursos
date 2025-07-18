@@ -26,11 +26,11 @@ export default function RootLayout({
                 <QueryProvider>
                     <NotificationProvider>
                         <AuthInitializer>
-                            <Toaster 
-                                position="top-center" 
+                            <Toaster
+                                position="top-center"
                                 toastOptions={{
                                     style: {
-                                        color: '#000000',
+                                        color: "#000000",
                                     },
                                 }}
                                 theme="light"

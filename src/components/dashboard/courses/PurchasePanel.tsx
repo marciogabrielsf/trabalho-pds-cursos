@@ -90,14 +90,21 @@ const PurchasePanel: React.FC<PurchasePanelProps> = ({
             };
         } else if (selectedPayment === "boleto") {
             option = {
-                id: "boleto",
+                id: "billet",
                 title: "Boleto a vista",
                 description: "Boleto",
                 price: price,
                 originalPrice: price,
             };
         } else {
-            option = paymentOptions.find((opt) => opt.id === selectedPayment);
+            // Para pagamentos com cartão, mapear para credit_card
+            const foundOption = paymentOptions.find((opt) => opt.id === selectedPayment);
+            if (foundOption) {
+                option = {
+                    ...foundOption,
+                    id: "credit-card", // Mapear todos os pagamentos de cartão para credit-card
+                };
+            }
         }
 
         if (option) {

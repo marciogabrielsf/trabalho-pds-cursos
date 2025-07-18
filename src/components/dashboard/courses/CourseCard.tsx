@@ -16,8 +16,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
         }).format(price);
     };
 
-    console.log("CourseCard component rendered with course:", course);
-
     const isValidUrl = (url: string): boolean => {
         try {
             new URL(url);
@@ -102,11 +100,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
                 {/* Preço */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                        {course.value && (
-                            <span className="text-sm text-gray-400 line-through">
-                                {formatPrice(course.value)}
-                            </span>
-                        )}
                         <span className="text-lg  text-[#9D9D9D]">
                             {formatPrice(course.value || 0)}
                         </span>
