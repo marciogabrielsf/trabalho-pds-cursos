@@ -129,3 +129,12 @@ button {
 input, textarea {
   outline: none;
 }
+
+/* Estilos para o Sonner Toast */
+[data-sonner-toast] [data-description] {
+  color: #000000 !important;
+}
+
+[data-sonner-toast] [data-title] {
+  color: #000000 !important;
+}

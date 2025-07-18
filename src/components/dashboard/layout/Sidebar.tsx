@@ -3,6 +3,8 @@ import { BookOpen, LogOut, Settings, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { APP_NAME } from "@/config/config";
 import { useAuthStore } from "@/stores/authStore";
+import Image from "next/image";
+import Logo from "@/../public/logo.jpeg";
 
 interface SidebarProps {
     activeItem?: string;
@@ -46,10 +48,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = "courses", onItemClick }
             <div className="p-6 h-full flex flex-col">
                 {/* Logo */}
                 <div className="flex items-center space-x-2 mb-8">
-                    <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
-                        <div className="w-4 h-4 bg-white rounded-sm"></div>
-                    </div>
-                    <span className="text-xl font-bold text-secondary">{APP_NAME}</span>
+                    <Image src={Logo} alt="Logo" width={32} height={32} className="rounded-full" />
+                    <span className="text-xl font-bold text-black">{APP_NAME}</span>
                 </div>
                 <div className="flex flex-col justify-between h-full">
                     <div className="mb-6">

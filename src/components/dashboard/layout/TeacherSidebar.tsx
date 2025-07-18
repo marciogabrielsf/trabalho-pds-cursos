@@ -3,6 +3,8 @@ import { BookOpen, LogOut, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { APP_NAME } from "@/config/config";
 import { useAuthStore } from "@/stores/authStore";
+import Image from "next/image";
+import Logo from "@/../public/logo.jpeg";
 
 interface TeacherSidebarProps {
     activeItem?: string;
@@ -39,7 +41,13 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ activeItem = "courses",
                 {/* Logo */}
                 <div className="flex items-center space-x-2 mb-8">
                     <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
-                        <div className="w-4 h-4 bg-white rounded-sm"></div>
+                        <Image
+                            src={Logo}
+                            alt="Logo"
+                            width={40}
+                            height={40}
+                            className="rounded-full"
+                        />
                     </div>
                     <span className="text-xl font-bold text-secondary">{APP_NAME}</span>
                 </div>

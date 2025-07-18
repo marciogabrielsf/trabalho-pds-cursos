@@ -9,6 +9,8 @@ export * from "./useWizardSteps";
 export * from "./useStatusDialog";
 export * from "./useCommentQuery";
 export * from "./useTaskQuery";
+export * from "./useNotifications";
+export * from "./useNotificationFilters";
 
 import { useAuthStore } from "@/stores/authStore";
 

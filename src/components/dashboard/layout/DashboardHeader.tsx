@@ -1,8 +1,8 @@
 import React from "react";
-import { Bell, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "next/navigation";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import NotificationBadge from "./NotificationBadge";
 
 const DashboardHeader: React.FC = () => {
     const { user, logout } = useAuthStore();
@@ -38,25 +38,7 @@ const DashboardHeader: React.FC = () => {
                 </div>
                 {/* Perfil do usuário */}
                 <div className="flex items-center space-x-2">
-                    <div className="flex items-center p-2 bg-[#F9F9F9] rounded-lg">
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <button className="text-highlight transition-colors">
-                                    <Bell size={24} />
-                                </button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-80">
-                                <div className="grid gap-4">
-                                    <div className="space-y-2">
-                                        <h4 className="leading-none font-medium">Dimensions</h4>
-                                        <p className="text-muted-foreground text-sm">
-                                            Set the dimensions for the layer.
-                                        </p>
-                                    </div>
-                                </div>
-                            </PopoverContent>
-                        </Popover>
-                    </div>
+                    <NotificationBadge />
                     <button
                         onClick={handleLogout}
                         className="flex items-center p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"

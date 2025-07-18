@@ -8,3 +8,4 @@ export * from "./user";
 export * from "./ui";
 export * from "./comment";
 export * from "./activity";
+export * from "./notification";
