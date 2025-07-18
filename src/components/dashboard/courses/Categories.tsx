@@ -76,10 +76,6 @@ const Categories: React.FC<CategoriesProps> = ({
                         >
                             {category.name}
                         </h3>
-
-                        <p className={`text-xs transition-colors text-gray-500`}>
-                            {category.coursesCount} Cursos
-                        </p>
                     </button>
                 ))}
             </div>

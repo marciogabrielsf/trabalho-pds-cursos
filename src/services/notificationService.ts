@@ -2,10 +2,15 @@ import { api } from "@/services/api";
 import type { Notification, SendNotificationRequest } from "@/types/notification";
 
 export class NotificationService {
-    // Buscar notificações do usuário
-    static async getUserNotifications(userId: number): Promise<Notification[]> {
+    // Buscar notificações do usuário (estudante ou professor)
+    static async getUserNotifications(userId: number, userRole?: string): Promise<Notification[]> {
         try {
-            const response = await api.get(`/notifications/user/${userId}`);
+            let response;
+            if (userRole === "teacher") {
+                response = await api.get(`/notifications/teacher/${userId}`);
+            } else {
+                response = await api.get(`/notifications/user/${userId}`);
+            }
             return response.data;
         } catch (error) {
             console.error("Erro ao buscar notificações:", error);
@@ -13,10 +18,26 @@ export class NotificationService {
         }
     }
 
-    // Buscar contagem de não lidas
-    static async getUnreadCount(userId: number): Promise<number> {
+    // Buscar notificações específicas de teacher
+    static async getTeacherNotifications(teacherId: number): Promise<Notification[]> {
         try {
-            const response = await api.get(`/notifications/user/${userId}/count`);
+            const response = await api.get(`/notifications/teacher/${teacherId}`);
+            return response.data;
+        } catch (error) {
+            console.error("Erro ao buscar notificações do professor:", error);
+            throw error;
+        }
+    }
+
+    // Buscar contagem de não lidas (com suporte a teacher)
+    static async getUnreadCount(userId: number, userRole?: string): Promise<number> {
+        try {
+            let response;
+            if (userRole === "teacher") {
+                response = await api.get(`/notifications/teacher/${userId}/count`);
+            } else {
+                response = await api.get(`/notifications/user/${userId}/count`);
+            }
             return response.data.count || 0;
         } catch (error) {
             console.error("Erro ao buscar contagem de não lidas:", error);

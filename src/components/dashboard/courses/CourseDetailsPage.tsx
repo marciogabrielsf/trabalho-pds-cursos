@@ -146,7 +146,7 @@ const CourseDetailsPage: React.FC = () => {
 
     const handleGoToCourse = () => {
         setShowSuccessModal(false);
-        router.push(`/dashboard/student/my-courses/${courseId}`); // Usar courseId da URL
+        router.push(`/dashboard/student/my-courses/`);
     };
 
     // Configurações de animação

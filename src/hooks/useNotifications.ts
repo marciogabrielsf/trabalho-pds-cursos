@@ -27,8 +27,9 @@ export const useNotifications = () => {
 
     // Query para buscar notificações do usuário
     const { data: notifications = [], isLoading } = useQuery({
-        queryKey: ["notifications", user?.id],
-        queryFn: () => (user?.id ? NotificationService.getUserNotifications(user.id) : []),
+        queryKey: ["notifications", user?.id, user?.role],
+        queryFn: () =>
+            user?.id ? NotificationService.getUserNotifications(user.id, user.role) : [],
         enabled: !!user?.id && isAuthenticated,
         staleTime: 1000 * 60, // 1 minuto
         refetchOnWindowFocus: true,
@@ -36,8 +37,8 @@ export const useNotifications = () => {
 
     // Query para contagem de não lidas
     const { data: unreadCount = 0 } = useQuery({
-        queryKey: ["notifications-unread-count", user?.id],
-        queryFn: () => (user?.id ? NotificationService.getUnreadCount(user.id) : 0),
+        queryKey: ["notifications-unread-count", user?.id, user?.role],
+        queryFn: () => (user?.id ? NotificationService.getUnreadCount(user.id, user.role) : 0),
         enabled: !!user?.id && isAuthenticated,
         staleTime: 1000 * 30, // 30 segundos
         refetchInterval: 1000 * 60, // Revalida a cada minuto
@@ -47,8 +48,10 @@ export const useNotifications = () => {
     const markAsReadMutation = useMutation({
         mutationFn: NotificationService.markAsRead,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
-            queryClient.invalidateQueries({ queryKey: ["notifications-unread-count", user?.id] });
+            queryClient.invalidateQueries({ queryKey: ["notifications", user?.id, user?.role] });
+            queryClient.invalidateQueries({
+                queryKey: ["notifications-unread-count", user?.id, user?.role],
+            });
         },
         onError: (error) => {
             console.error("Erro ao marcar como lida:", error);
@@ -59,8 +62,10 @@ export const useNotifications = () => {
     const deleteNotificationMutation = useMutation({
         mutationFn: NotificationService.deleteNotification,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
-            queryClient.invalidateQueries({ queryKey: ["notifications-unread-count", user?.id] });
+            queryClient.invalidateQueries({ queryKey: ["notifications", user?.id, user?.role] });
+            queryClient.invalidateQueries({
+                queryKey: ["notifications-unread-count", user?.id, user?.role],
+            });
             toast.success("Notificação removida");
         },
         onError: (error) => {
@@ -73,8 +78,10 @@ export const useNotifications = () => {
         mutationFn: () =>
             user?.id ? NotificationService.markAllAsRead(user.id) : Promise.reject(),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
-            queryClient.invalidateQueries({ queryKey: ["notifications-unread-count", user?.id] });
+            queryClient.invalidateQueries({ queryKey: ["notifications", user?.id, user?.role] });
+            queryClient.invalidateQueries({
+                queryKey: ["notifications-unread-count", user?.id, user?.role],
+            });
             toast.success("Todas as notificações foram marcadas como lidas");
         },
         onError: (error) => {
@@ -134,9 +141,11 @@ export const useNotifications = () => {
                     setReconnectAttempts(0);
 
                     // Invalidar queries para sincronizar dados
-                    queryClient.invalidateQueries({ queryKey: ["notifications", user.id] });
                     queryClient.invalidateQueries({
-                        queryKey: ["notifications-unread-count", user.id],
+                        queryKey: ["notifications", user.id, user.role],
+                    });
+                    queryClient.invalidateQueries({
+                        queryKey: ["notifications-unread-count", user.id, user.role],
                     });
                 };
 
@@ -183,9 +192,11 @@ export const useNotifications = () => {
                         console.log("📢 Nova notificação recebida:", message);
 
                         // Invalidar queries para buscar dados atualizados
-                        queryClient.invalidateQueries({ queryKey: ["notifications", user.id] });
                         queryClient.invalidateQueries({
-                            queryKey: ["notifications-unread-count", user.id],
+                            queryKey: ["notifications", user.id, user.role],
+                        });
+                        queryClient.invalidateQueries({
+                            queryKey: ["notifications-unread-count", user.id, user.role],
                         });
 
                         // Mostrar toast com sonner
